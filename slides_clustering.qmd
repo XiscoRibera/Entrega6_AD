@@ -4,3 +4,5 @@ author: "Xisco Ribera& Irene Julià"
 format: revealjs
 editor: visual
 ---
+
+prueba diapos
