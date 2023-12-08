@@ -1,0 +1,8 @@
+---
+title: "Clustering"
+author: "Xisco Ribera & Irene Julià"
+format: html
+editor: visual
+---
+
+
