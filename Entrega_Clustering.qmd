@@ -1,10 +1,12 @@
 ---
 title: "Clustering"
 author: "Xisco Ribera & Irene Julià"
-format: html
+format:
+  html:
+    toc: true
+    toc-depth: 5
 editor: visual
 ---
-
 
 # Presentación del problema
 
@@ -19,7 +21,6 @@ Los datos provienen de la página web Kaggle: [Kaggle - Cirrhosis Prediction Dat
 El dataset consta de 418 muestras, donde cada una representa una serie de características de un paciente. A cada paciente se le atribuyen 20 valores, uno de ellos es su ID, y el resto son variables relacionadas con la salud.
 
 Antes de explicar cada variable, modifiquemos la tabla de datos para tenerla limpia en formato tidy.
-
 
 Cargamos la librerías que utilizaremos
 
@@ -36,8 +37,6 @@ library(nortest)
 library(fBasics)
 library(ggplot2)
 ```
-
-
 
 # Convertir los datos en tidy
 
@@ -96,8 +95,38 @@ datos[count_NA(datos),]
 
 ```{r}
 datos = na.omit(datos)
-glimpse(datos)
+datos
 ```
+
+
+
+Ascites
+Hepatomegaly
+Spiders
+Edema
+Stage
+
+
+
+Guardamos el dataset:
+
+```{r}
+# write.table(datos, "cirrosis_tidy.csv")
+```
+
+
+Cargamos los datos:
+
+```{r}
+#datos <- read_csv("cirrosis_tidy.csv",
+#                  cols(Ascites = col_factor(),
+ #                      Hepatomegaly = col_factor(),
+  #                     Spiders = col_factor(),
+   #                    Edema = col_factor(),
+    #                   Stage = col_factor()))
+#glimpse(datos)
+```
+
 
 El tibble resultante consta de 276 observaciones y 20 variables. Cada muestra representa un paciente al que se le ha extraido la siguiente información:
 
@@ -113,7 +142,7 @@ El tibble resultante consta de 276 observaciones y 20 variables. Cada muestra re
 -   `Edema`: Presencia de Edema: No (no hay edema y sin tratamiento diurético para el edema), Sin (presencia de edema sin diuréticos, o edema curado con diuréticos), o Si (edema a pesar del tratamiento con diuréticos)
 -   `Bilirubin`: Bilirrubina sérica \[mg/dl\]
 -   `Cholesterol`: Colesterol sérico \[mg/dl\]
--   `Albumin`: Albúmina \[gm/dl\]
+-   `Albumin`: Albúmina \[g/dl\]
 -   `Copper`: Cobre en orina \[ug/day\]
 -   `Alk_Phos`: Fosfatasa alcalina \[U/liter\]
 -   `SGOT`: SGOT \[U/ml\]
@@ -121,14 +150,6 @@ El tibble resultante consta de 276 observaciones y 20 variables. Cada muestra re
 -   `Platelets`: Plaquetas por cúbico \[ml/1000\]
 -   `Prothrombin`: Tiempo de Protrombina \[s\]
 -   `Stage`: Estado histórico de la enfermedad (1, 2, 3, or 4)
-
-
-
-
-
-
-
-
 
 # Variables
 
@@ -140,11 +161,12 @@ Empezamos por las cuantitativas
 # Separamos los datos en variables cuantitativas y cualitativas
 datos_quant <- datos %>% 
   select(where(is.numeric)) %>% 
-  select(-1) # id
+  select(-1)
 
 
 datos_qual <- datos %>% 
   select(where(is.factor))
+
 
 # Cuantitativas
 
@@ -160,7 +182,13 @@ Minimo = round(apply(datos_quant, FUN = min, 2),3)
 Maximo = round(apply(datos_quant, FUN = max, 2),3)
 Desv = round(apply(datos_quant, FUN = sd, 2), 3)
 
+length(Rango)
+
+
+
+
 tabla = data.frame(Unidad, Media, Desv, Minimo, Maximo, Rango)
+
 tabla
 ```
 
@@ -169,8 +197,6 @@ Veamos ahora los datos cualitativos
 ```{r, echo=FALSE}
 summary(datos_qual)
 ```
-
-
 
 # Estimación del vector de medias y la matriz de covarianza y correlación
 
@@ -182,18 +208,17 @@ apply(datos_quant, FUN = mean, MARGIN = 2)
 
 Veamos ahora la matriz de covarianza (a secas)
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval =FALSE}
 new_names = substr(names(datos_quant),1,5)
 colnames(datos_quant) = new_names
+```
 
 
+```{r, echo=FALSE}
 n = length(datos$ID)
 
 round(cov(datos_quant)*(n-1)/n,5)
 ```
-
-
-
 
 ```{r, eval=FALSE, echo=FALSE}
 lims=c(18,30,50,70,Inf)  # esta en anys i noltros tenim en dies
@@ -203,19 +228,11 @@ Etiquetas = c("Joven", "Adulto30-50","Adulto50-70","Mayor")
 datos$Age = cut(datos$Age, breaks = lims, labels = Etiquetas, right = FALSE)
 ```
 
-
-
-
 # Análisis multivariante
-
-
 
 ```{r, cache = TRUE, warning=FALSE, message=FALSE}
 ggpairs(datos_quant)
 ```
-
-
-
 
 ```{r, echo=FALSE}
 corPlot(datos_quant, cex = 0.8,  main = "Matriz de correlación", xsrt = 50, 
@@ -224,7 +241,6 @@ corPlot(datos_quant, cex = 0.8,  main = "Matriz de correlación", xsrt = 50,
 ```
 
 # Análisis de normalidad multivariante
-
 
 Con estos datos vamos a realizar nuestro estudio de normalidad multivariante.
 
@@ -269,7 +285,7 @@ Veamos una por una si se distribuyen normalmente. Aplicaremos a cada variable el
 Observemos el qqplot:
 
 ```{r}
-qqPlot(datos_quant$N_Days, main = "N_days")
+qqPlot(datos$N_Days, main = "N_days")
 ```
 
 Observemos que en las colas encontramos muchas muestras que se salen de las bandas de confianza, por tanto es un indicador que de questa variable no siga una normal. Corroboremoslo con un test.
