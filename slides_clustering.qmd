@@ -1,0 +1,6 @@
+---
+title: "Slides_clustering"
+author: "Xisco Ribera& Irene Julià"
+format: revealjs
+editor: visual
+---
