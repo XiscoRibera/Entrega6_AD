@@ -20,7 +20,11 @@ library(car)
 library(nortest)
 library(fBasics)
 library(ggplot2)
+library(factoextra)
+library(stats)
+library(cluster)
 ```
+
 
 # Recordatorio
 
@@ -145,4 +149,92 @@ mvnormtest::mshapiro.test(t(datos_quant))
 Obtenemos un p-valor muy pequeño, prácticamente 0, entonces, rechazamos la hipótesis nula y concluimos que no hay normalidad multivariante, es decir, almenos una variable individual no se distribuye normalmente.
 
 
-# 
+# Clusterning
+
+En primer lugar vamos a tipificar o escalar nuestros datos para que esten todos a la misma escala:
+
+```{r}
+datos2 <- datos_quant %>% scale()
+```
+
+A continuación realicemos una representación gráfica de matrices de distancia:
+
+Primero de todo vamos a centrar la matriz de datos:
+
+```{r}
+n <- dim(datos2)[1]
+X <- as.matrix(datos2)
+Hn <- diag(n)-1/n # matriz de centrado
+cX <- Hn%*%X # matriz centrada
+```
+
+
+```{r}
+mat_dist <- dist(x = cX, method = "euclidean")
+```
+
+
+```{r, cache = TRUE}
+fviz_dist(dist.obj = mat_dist, lab_size = 5) +
+ theme(legend.position = "none")
+```
+## K-means
+
+En nuestro caso, no sabemos cuantos clusters o grupos esta dividido nuestro dataset. Por tanto vamos a estimar al número $k$ óptimo para aplicar el `kmeans()`. Para ello utilizaremos la función `fviz_nbclust()`:
+
+```{r}
+fviz_nbclust(x = cX, FUNcluster = kmeans, method = "wss",
+ diss = dist(cX, method = "euclidean")) +
+ geom_vline(xintercept = 3, linetype = 2)
+
+```
+
+Observemos que el número óptimo para aplicar el kmeans és $4$, ya que con $5$ el error aumenta y con $6$ el error es practicamente igual que con $4$. Por tanot procedamos a hacer un `kmeans()` con $k=4$:
+
+
+```{r}
+#set.seed(2312)
+km_clusters <- kmeans(x = cX, centers = 3, nstart = 100)
+
+fviz_cluster(object = km_clusters, data = cX, show.clust.cent = TRUE, geom ="point",
+ ellipse.type = "euclid", star.plot = TRUE, repel = TRUE) +
+theme_bw() +
+theme(legend.position = "none")
+```
+Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente
+realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2)
+
+
+```{r}
+km_clusters
+```
+
+## K-medoids (PAM)
+
+En este caso, cada cluster está representado por una observación presente en el cluster (medoid), mientras que en K-means cada cluster está representado por su centroide,
+que se corresponde con el promedio de todas las observaciones del cluster pero con ninguna en particular.
+
+```{r, warning=FALSE}
+fviz_nbclust(x = cX, FUNcluster = pam, method = "wss",
+ diss = dist(datos, method = "manhattan"))+
+  geom_vline(xintercept = 6, linetype = 2)
+```
+
+
+```{r}
+pam_clusters <- pam(x = cX, k = 3, metric = "euclidean")
+
+fviz_cluster(object = pam_clusters, data = cX, ellipse.type = "t", geom = "point",  repel = TRUE) +
+  theme_bw() + 
+  theme(legend.position = "none")
+```
+## Dendograma
+
+```{r, cache =TRUE}
+set.seed(101)
+hc_completo <- datos_quant %>% scale() %>% dist(method = "euclidean") %>%
+ hclust(method = "complete")
+fviz_dend(x = hc_completo, k = 3, cex = 0.6) +
+ geom_hline(yintercept = 5.5, linetype = "dashed")
+```
+
