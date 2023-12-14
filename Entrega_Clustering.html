@@ -80,12 +80,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#presentación-del-problema" id="toc-presentación-del-problema" class="nav-link active" data-scroll-target="#presentación-del-problema">Presentación del problema</a></li>
-  <li><a href="#convertir-los-datos-en-tidy" id="toc-convertir-los-datos-en-tidy" class="nav-link" data-scroll-target="#convertir-los-datos-en-tidy">Convertir los datos en tidy</a></li>
-  <li><a href="#variables" id="toc-variables" class="nav-link" data-scroll-target="#variables">Variables</a></li>
-  <li><a href="#estimación-del-vector-de-medias-y-la-matriz-de-covarianza-y-correlación" id="toc-estimación-del-vector-de-medias-y-la-matriz-de-covarianza-y-correlación" class="nav-link" data-scroll-target="#estimación-del-vector-de-medias-y-la-matriz-de-covarianza-y-correlación">Estimación del vector de medias y la matriz de covarianza y correlación</a></li>
-  <li><a href="#análisis-multivariante" id="toc-análisis-multivariante" class="nav-link" data-scroll-target="#análisis-multivariante">Análisis multivariante</a></li>
+  <li><a href="#recordatorio" id="toc-recordatorio" class="nav-link active" data-scroll-target="#recordatorio">Recordatorio</a>
+  <ul>
+  <li><a href="#resumen-numérico-de-las-variables" id="toc-resumen-numérico-de-las-variables" class="nav-link" data-scroll-target="#resumen-numérico-de-las-variables">Resumen numérico de las variables</a></li>
   <li><a href="#análisis-de-normalidad-multivariante" id="toc-análisis-de-normalidad-multivariante" class="nav-link" data-scroll-target="#análisis-de-normalidad-multivariante">Análisis de normalidad multivariante</a></li>
+  </ul></li>
+  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"></a></li>
   </ul>
 </nav>
 </div>
@@ -114,17 +114,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<section id="presentación-del-problema" class="level1">
-<h1>Presentación del problema</h1>
-<p>Vamos a tratar una base de datos relacionados con la predicción de riesgo de cirrosis. La cirrosis es una etapa tardía de la cicatrización (fibrosis) del hígado causada por muchas formas de enfermedades y afecciones hepáticas, como la hepatitis y el alcoholismo crónico.</p>
-<p>Nuestro objetivo para este estudio sería:</p>
-<ol type="1">
-<li>Estudiar algunos perfiles con riesgo de padecer cirrosis.</li>
-</ol>
-<p>Los datos provienen de la página web Kaggle: <a href="https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset">Kaggle - Cirrhosis Prediction Dataset</a>.</p>
-<p>El dataset consta de 418 muestras, donde cada una representa una serie de características de un paciente. A cada paciente se le atribuyen 20 valores, uno de ellos es su ID, y el resto son variables relacionadas con la salud.</p>
-<p>Antes de explicar cada variable, modifiquemos la tabla de datos para tenerla limpia en formato tidy.</p>
-<p>Cargamos la librerías que utilizaremos</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
@@ -138,132 +127,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fBasics)</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
-<section id="convertir-los-datos-en-tidy" class="level1">
-<h1>Convertir los datos en tidy</h1>
-<p>Cargamos la tabla de datos y la convertimos a tibble para facilitarnos la manipulación.</p>
+<section id="recordatorio" class="level1">
+<h1>Recordatorio</h1>
+<p>Vamos a tratar una base de datos relacionados con la predicción de riesgo de cirrosis. La cirrosis es una etapa tardía de la cicatrización (fibrosis) del hígado causada por muchas formas de enfermedades y afecciones hepáticas, como la hepatitis y el alcoholismo crónico.</p>
+<p>Nuestro objetivo para este estudio sería estudiar algunos perfiles con riesgo de padecer cirrosis.</p>
+<p>Recordemos nuestra tabla de datos:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">=</span> <span class="fu">read.csv</span>(<span class="st">"cirrhosis.csv"</span>, <span class="at">header =</span> T)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">=</span> datos <span class="sc">%&gt;%</span> as.tibble</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(datos)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Rows: 418
-Columns: 20
-$ ID            &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 1…
-$ N_Days        &lt;int&gt; 400, 4500, 1012, 1925, 1504, 2503, 1832, 2466, 2400, 51,…
-$ Status        &lt;chr&gt; "D", "C", "D", "D", "CL", "D", "C", "D", "D", "D", "D", …
-$ Drug          &lt;chr&gt; "D-penicillamine", "D-penicillamine", "D-penicillamine",…
-$ Age           &lt;int&gt; 21464, 20617, 25594, 19994, 13918, 24201, 20284, 19379, …
-$ Sex           &lt;chr&gt; "F", "F", "M", "F", "F", "F", "F", "F", "F", "F", "F", "…
-$ Ascites       &lt;chr&gt; "Y", "N", "N", "N", "N", "N", "N", "N", "N", "Y", "N", "…
-$ Hepatomegaly  &lt;chr&gt; "Y", "Y", "N", "Y", "Y", "Y", "Y", "N", "N", "N", "Y", "…
-$ Spiders       &lt;chr&gt; "Y", "Y", "N", "Y", "Y", "N", "N", "N", "Y", "Y", "Y", "…
-$ Edema         &lt;chr&gt; "Y", "N", "S", "S", "N", "N", "N", "N", "N", "Y", "N", "…
-$ Bilirubin     &lt;dbl&gt; 14.5, 1.1, 1.4, 1.8, 3.4, 0.8, 1.0, 0.3, 3.2, 12.6, 1.4,…
-$ Cholesterol   &lt;int&gt; 261, 302, 176, 244, 279, 248, 322, 280, 562, 200, 259, 2…
-$ Albumin       &lt;dbl&gt; 2.60, 4.14, 3.48, 2.54, 3.53, 3.98, 4.09, 4.00, 3.08, 2.…
-$ Copper        &lt;int&gt; 156, 54, 210, 64, 143, 50, 52, 52, 79, 140, 46, 94, 40, …
-$ Alk_Phos      &lt;dbl&gt; 1718.0, 7394.8, 516.0, 6121.8, 671.0, 944.0, 824.0, 4651…
-$ SGOT          &lt;dbl&gt; 137.95, 113.52, 96.10, 60.63, 113.15, 93.00, 60.45, 28.3…
-$ Tryglicerides &lt;int&gt; 172, 88, 55, 92, 72, 63, 213, 189, 88, 143, 79, 95, 130,…
-$ Platelets     &lt;int&gt; 190, 221, 151, 183, 136, NA, 204, 373, 251, 302, 258, 71…
-$ Prothrombin   &lt;dbl&gt; 12.2, 10.6, 12.0, 10.3, 10.9, 11.0, 9.7, 11.0, 11.0, 11.…
-$ Stage         &lt;int&gt; 4, 3, 4, 4, 3, 3, 3, 3, 2, 4, 4, 4, 3, 4, 3, 3, 4, 4, 3,…</code></pre>
-</div>
-</div>
-<p>Vamos a modificar el data set para que sea más cómodo a la hora de trabajar con él.</p>
-<p>Transformamos las variables qualitativas en factor y, en las de Si o No (Y: Si, N: No) cambiamos los valores para que sea más ilustrativa y entendible. De la misma forma con el sexo cromosómico (F: Female, M: Male)</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">=</span> datos <span class="sc">%&gt;%</span> </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Status =</span> <span class="fu">factor</span>(Status, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"C"</span>, <span class="st">"CL"</span>, <span class="st">"D"</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Cens"</span>, </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                                                      <span class="st">"Cens_Trat"</span>, <span class="st">"Muerto"</span>)))</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">=</span> datos <span class="sc">%&gt;%</span> </span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Drug =</span> Drug <span class="sc">%&gt;%</span> as.factor)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">=</span> datos <span class="sc">%&gt;%</span> </span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sex =</span> <span class="fu">if_else</span>(Sex <span class="sc">==</span> <span class="st">"F"</span>, <span class="st">"Female"</span>, <span class="st">"Male"</span>) <span class="sc">%&gt;%</span> as.factor)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">=</span> datos <span class="sc">%&gt;%</span> </span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Ascites =</span> <span class="fu">if_else</span>(Ascites <span class="sc">==</span> <span class="st">"Y"</span>, <span class="st">"Si"</span>, <span class="st">"No"</span>) <span class="sc">%&gt;%</span> as.factor)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">=</span> datos <span class="sc">%&gt;%</span> </span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Hepatomegaly =</span> <span class="fu">if_else</span>(Hepatomegaly <span class="sc">==</span> <span class="st">"Y"</span>, <span class="st">"Si"</span>, <span class="st">"No"</span>) <span class="sc">%&gt;%</span> as.factor)</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">=</span> datos <span class="sc">%&gt;%</span> </span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Spiders =</span> <span class="fu">if_else</span>(Spiders <span class="sc">==</span> <span class="st">"Y"</span>, <span class="st">"Si"</span>, <span class="st">"No"</span>) <span class="sc">%&gt;%</span> as.factor)</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">=</span> datos <span class="sc">%&gt;%</span> </span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Edema =</span> <span class="fu">factor</span>(Edema, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Y"</span>, <span class="st">"N"</span>, <span class="st">"S"</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Si"</span>, <span class="st">"No"</span>,</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>                                                                     <span class="st">"Sin"</span>)))</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">=</span> datos <span class="sc">%&gt;%</span> </span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Stage =</span> Stage <span class="sc">%&gt;%</span> as.factor)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Observemos que hay muestras que tienen valores desconocidos (NA). Veamos cuales son:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 142 × 20
-      ID N_Days Status Drug         Age Sex   Ascites Hepatomegaly Spiders Edema
-   &lt;int&gt;  &lt;int&gt; &lt;fct&gt;  &lt;fct&gt;      &lt;int&gt; &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt;        &lt;fct&gt;   &lt;fct&gt;
- 1     6   2503 Muerto Placebo    24201 Fema… No      Si           No      No   
- 2    14   1217 Muerto Placebo    20535 Male  Si      Si           No      Si   
- 3    40   4467 Cens   D-penicil… 17046 Fema… No      No           No      No   
- 4    41   1350 Muerto D-penicil… 12285 Fema… No      Si           No      No   
- 5    42   4453 Cens   Placebo    12307 Fema… No      Si           Si      No   
- 6    45   4025 Cens   Placebo    15265 Fema… No      No           No      No   
- 7    49    708 Muerto Placebo    22336 Fema… No      Si           No      No   
- 8    53   1000 Muerto D-penicil… 24621 Fema… No      Si           No      No   
- 9    58   4459 Cens   D-penicil… 16279 Male  No      No           No      No   
-10    70   3458 Cens   D-penicil… 20600 Fema… No      No           No      No   
-# ℹ 132 more rows
-# ℹ 10 more variables: Bilirubin &lt;dbl&gt;, Cholesterol &lt;int&gt;, Albumin &lt;dbl&gt;,
-#   Copper &lt;int&gt;, Alk_Phos &lt;dbl&gt;, SGOT &lt;dbl&gt;, Tryglicerides &lt;int&gt;,
-#   Platelets &lt;int&gt;, Prothrombin &lt;dbl&gt;, Stage &lt;fct&gt;</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">=</span> <span class="fu">na.omit</span>(datos)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>datos</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 276 × 20
-      ID N_Days Status    Drug      Age Sex   Ascites Hepatomegaly Spiders Edema
-   &lt;int&gt;  &lt;int&gt; &lt;fct&gt;     &lt;fct&gt;   &lt;int&gt; &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt;        &lt;fct&gt;   &lt;fct&gt;
- 1     1    400 Muerto    D-peni… 21464 Fema… Si      Si           Si      Si   
- 2     2   4500 Cens      D-peni… 20617 Fema… No      Si           Si      No   
- 3     3   1012 Muerto    D-peni… 25594 Male  No      No           No      Sin  
- 4     4   1925 Muerto    D-peni… 19994 Fema… No      Si           Si      Sin  
- 5     5   1504 Cens_Trat Placebo 13918 Fema… No      Si           Si      No   
- 6     7   1832 Cens      Placebo 20284 Fema… No      Si           No      No   
- 7     8   2466 Muerto    Placebo 19379 Fema… No      No           No      No   
- 8     9   2400 Muerto    D-peni… 15526 Fema… No      No           Si      No   
- 9    10     51 Muerto    Placebo 25772 Fema… Si      No           Si      Si   
-10    11   3762 Muerto    Placebo 19619 Fema… No      Si           Si      No   
-# ℹ 266 more rows
-# ℹ 10 more variables: Bilirubin &lt;dbl&gt;, Cholesterol &lt;int&gt;, Albumin &lt;dbl&gt;,
-#   Copper &lt;int&gt;, Alk_Phos &lt;dbl&gt;, SGOT &lt;dbl&gt;, Tryglicerides &lt;int&gt;,
-#   Platelets &lt;int&gt;, Prothrombin &lt;dbl&gt;, Stage &lt;fct&gt;</code></pre>
-</div>
-</div>
-<p>Ascites Hepatomegaly Spiders Edema Stage</p>
-<p>Guardamos el dataset:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.table</span>(datos, <span class="st">"cirrosis_tidy.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Cargamos los datos:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">"cirrosis_tidy.csv"</span>,  <span class="at">header =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">=</span> datos <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Ascites =</span> Ascites <span class="sc">%&gt;%</span> as.factor,</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Hepatomegaly =</span> Hepatomegaly <span class="sc">%&gt;%</span> as.factor,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Spiders =</span> Spiders <span class="sc">%&gt;%</span> as.factor,</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Edema =</span> Edema <span class="sc">%&gt;%</span> as.factor,</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Stage =</span> Stage <span class="sc">%&gt;%</span> as.factor,</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Drug =</span> Drug <span class="sc">%&gt;%</span> as.factor,</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Sex =</span> Sex <span class="sc">%&gt;%</span> as.factor,</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Status =</span> Status <span class="sc">%&gt;%</span> as.factor)</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(datos)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">"cirrosis_tidy.csv"</span>,  <span class="at">header =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">=</span> datos <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Ascites =</span> Ascites <span class="sc">%&gt;%</span> as.factor,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Hepatomegaly =</span> Hepatomegaly <span class="sc">%&gt;%</span> as.factor,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Spiders =</span> Spiders <span class="sc">%&gt;%</span> as.factor,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Edema =</span> Edema <span class="sc">%&gt;%</span> as.factor,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Stage =</span> Stage <span class="sc">%&gt;%</span> as.factor,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Drug =</span> Drug <span class="sc">%&gt;%</span> as.factor,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Sex =</span> Sex <span class="sc">%&gt;%</span> as.factor,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Status =</span> Status <span class="sc">%&gt;%</span> as.factor)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(datos)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 276
 Columns: 20
@@ -312,15 +193,12 @@ $ Stage         &lt;fct&gt; 4, 3, 4, 4, 3, 3, 3, 2, 4, 4, 4, 3, 3, 3, 4, 4, 3, 4
 <li><code>Prothrombin</code>: Tiempo de Protrombina [s]</li>
 <li><code>Stage</code>: Estado histórico de la enfermedad (1, 2, 3, or 4)</li>
 </ul>
-</section>
-<section id="variables" class="level1">
-<h1>Variables</h1>
-<p>Vamos a crear una tabla con la información de cada variable.</p>
-<p>Empezamos por las cuantitativas</p>
+<section id="resumen-numérico-de-las-variables" class="level2">
+<h2 class="anchored" data-anchor-id="resumen-numérico-de-las-variables">Resumen numérico de las variables</h2>
+<ul>
+<li>Datos cuantitativos:</li>
+</ul>
 <div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 11</code></pre>
-</div>
 <div class="cell-output cell-output-stdout">
 <pre><code>               Unidad     Media     Desv  Minimo   Maximo    Rango
 N_Days           Días  1979.167 1112.380   41.00  4556.00  4515.00
@@ -336,7 +214,9 @@ Platelets     ml/1000   261.772   93.129   62.00   563.00   501.00
 Prothrombin         s    10.736    1.008    9.00    17.10     8.10</code></pre>
 </div>
 </div>
-<p>Veamos ahora los datos cualitativos</p>
+<ul>
+<li>Datos cualitativos:</li>
+</ul>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>       Status                 Drug         Sex      Ascites  Hepatomegaly
@@ -352,102 +232,25 @@ Prothrombin         s    10.736    1.008    9.00    17.10     8.10</code></pre>
 </div>
 </div>
 </section>
-<section id="estimación-del-vector-de-medias-y-la-matriz-de-covarianza-y-correlación" class="level1">
-<h1>Estimación del vector de medias y la matriz de covarianza y correlación</h1>
-<p>Calculemos el vector de medias para cada variable cuantitativa</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>       N_Days           Age     Bilirubin   Cholesterol       Albumin 
-  1979.166667  18189.326087      3.333696    371.260870      3.516812 
-       Copper      Alk_Phos          SGOT Tryglicerides     Platelets 
-   100.768116   1996.611594    124.119239    124.978261    261.771739 
-  Prothrombin 
-    10.735507 </code></pre>
-</div>
-</div>
-<p>Veamos ahora la matriz de covarianza (a secas)</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>                    N_Days           Age   Bilirubin   Cholesterol    Albumin
-N_Days        1232906.6244  -610129.4094 -2194.11504  -35582.06159  180.30136
-Age           -610129.4094 14719394.7270  1377.50822 -140841.57420 -371.54418
-Bilirubin       -2194.1150     1377.5082    21.09318     425.12744   -0.57906
-Cholesterol    -35582.0616  -140841.5742   425.12744   54925.84499   -6.37286
-Albumin           180.3014     -371.5442    -0.57906      -6.37286    0.16326
-Copper         -35355.3853    27932.2350   186.35673    2569.06049   -8.55871
-Alk_Phos       244885.5401  -160396.6451  1345.98758   75362.37161  -95.13112
-SGOT           -12011.1921   -26254.5595   110.50816    4736.62317   -4.53434
-Tryglicerides  -11855.3804     6177.4853   131.58769    4182.83900   -2.88761
-Platelets       16424.4004   -53372.3893   -31.76224    4194.91462    7.45960
-Prothrombin      -143.5027      945.1888     1.53087      -7.87231   -0.08117
-                    Copper      Alk_Phos         SGOT Tryglicerides
-N_Days        -35355.38527  244885.54010 -12011.19208  -11855.38043
-Age            27932.23503 -160396.64509 -26254.55950    6177.48535
-Bilirubin        186.35673    1345.98758    110.50816     131.58769
-Cholesterol     2569.06049   75362.37161   4736.62317    4182.83900
-Albumin           -8.55871     -95.13112     -4.53434      -2.88761
-Copper          7763.14188   35519.94834   1505.80848    1633.87539
-Alk_Phos       35519.94834 4459032.05871  17364.40256   25121.02417
-SGOT            1505.80848   17364.40256   3205.49665     497.89872
-Tryglicerides   1633.87539   25121.02417    497.89872    4246.13721
-Platelets       -687.81380   28904.94902   -310.26872     613.53127
-Prothrombin       18.95715     186.57104      3.98546       1.64534
-                 Platelets Prothrombin
-N_Days         16424.40036  -143.50266
-Age           -53372.38934   945.18878
-Bilirubin        -31.76224     1.53087
-Cholesterol     4194.91462    -7.87231
-Albumin            7.45960    -0.08117
-Copper          -687.81380    18.95715
-Alk_Phos       28904.94902   186.57104
-SGOT            -310.26872     3.98546
-Tryglicerides    613.53127     1.64534
-Platelets       8641.56022   -18.04443
-Prothrombin      -18.04443     1.01301</code></pre>
-</div>
-</div>
-</section>
-<section id="análisis-multivariante" class="level1">
-<h1>Análisis multivariante</h1>
-<div class="cell" data-hash="Entrega_Clustering_cache/html/unnamed-chunk-14_11d9b0102ab39d117fb052f31f9cf30c">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggpairs</span>(datos_quant)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</section>
-<section id="análisis-de-normalidad-multivariante" class="level1">
-<h1>Análisis de normalidad multivariante</h1>
+<section id="análisis-de-normalidad-multivariante" class="level2">
+<h2 class="anchored" data-anchor-id="análisis-de-normalidad-multivariante">Análisis de normalidad multivariante</h2>
 <p>Con estos datos vamos a realizar nuestro estudio de normalidad multivariante.</p>
 <p>Calculemos el vector de medias</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>Medias <span class="ot">=</span> <span class="fu">colMeans</span>(datos_quant)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>la matriz de covarianza:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>S <span class="ot">=</span> <span class="fu">cov</span>(datos_quant)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <p>y la distancia de Mahalanobis:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>d_Mahalanobis <span class="ot">=</span> <span class="fu">apply</span>(datos_quant, <span class="at">MARGIN =</span> <span class="dv">1</span>, <span class="cf">function</span>(x)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">t</span>(x <span class="sc">-</span> Medias)<span class="sc">%*%</span><span class="fu">solve</span>(S)<span class="sc">%*%</span>(x <span class="sc">-</span> Medias))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>d_Mahalanobis <span class="ot">=</span> <span class="fu">apply</span>(datos_quant, <span class="at">MARGIN =</span> <span class="dv">1</span>, <span class="cf">function</span>(x)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">t</span>(x <span class="sc">-</span> Medias)<span class="sc">%*%</span><span class="fu">solve</span>(S)<span class="sc">%*%</span>(x <span class="sc">-</span> Medias))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Una vez calculadas estas medidas, representemos los datos</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">qchisq</span>((<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(datos_quant) <span class="sc">-</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>) <span class="sc">/</span> <span class="fu">nrow</span>(datos_quant), <span class="at">df =</span> <span class="dv">3</span>), <span class="fu">sort</span>(d_Mahalanobis), <span class="at">xlab =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">"Cuantiles de la "</span>, chi[<span class="dv">20</span>]<span class="sc">^</span><span class="dv">2</span>)),<span class="at">ylab=</span><span class="st">"Distancias ordenadas"</span>)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">a=</span><span class="dv">0</span>,<span class="at">b=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Vamos a realizar un test de normalidad. Utilizaremos Shapiro-Wilk:</p>
+<p>Notemos que no sigue una Chi-cuadrado, i por tanto los datos tampoco siguen una normal multivariante.</p>
+<p>Vamos a realizar un test de normalidad para confirmarlo. Utilizaremos Shapiro-Wilk:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>mvnormtest<span class="sc">::</span><span class="fu">mshapiro.test</span>(<span class="fu">t</span>(datos_quant))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>mvnormtest<span class="sc">::</span><span class="fu">mshapiro.test</span>(<span class="fu">t</span>(datos_quant))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Shapiro-Wilk normality test
@@ -457,6 +260,10 @@ W = 0.83366, p-value &lt; 2.2e-16</code></pre>
 </div>
 </div>
 <p>Obtenemos un p-valor muy pequeño, prácticamente 0, entonces, rechazamos la hipótesis nula y concluimos que no hay normalidad multivariante, es decir, almenos una variable individual no se distribuye normalmente.</p>
+</section>
+</section>
+<section id="section" class="level1">
+<h1></h1>
 </section>
 
 </main>

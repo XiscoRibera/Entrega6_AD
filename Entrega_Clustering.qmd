@@ -8,22 +8,6 @@ format:
 editor: visual
 ---
 
-# Presentación del problema
-
-Vamos a tratar una base de datos relacionados con la predicción de riesgo de cirrosis. La cirrosis es una etapa tardía de la cicatrización (fibrosis) del hígado causada por muchas formas de enfermedades y afecciones hepáticas, como la hepatitis y el alcoholismo crónico.
-
-Nuestro objetivo para este estudio sería:
-
-1.  Estudiar algunos perfiles con riesgo de padecer cirrosis.
-
-Los datos provienen de la página web Kaggle: [Kaggle - Cirrhosis Prediction Dataset](https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset).
-
-El dataset consta de 418 muestras, donde cada una representa una serie de características de un paciente. A cada paciente se le atribuyen 20 valores, uno de ellos es su ID, y el resto son variables relacionadas con la salud.
-
-Antes de explicar cada variable, modifiquemos la tabla de datos para tenerla limpia en formato tidy.
-
-Cargamos la librerías que utilizaremos
-
 ```{r, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(dplyr)
@@ -38,84 +22,13 @@ library(fBasics)
 library(ggplot2)
 ```
 
-# Convertir los datos en tidy
+# Recordatorio
 
-Cargamos la tabla de datos y la convertimos a tibble para facilitarnos la manipulación.
+Vamos a tratar una base de datos relacionados con la predicción de riesgo de cirrosis. La cirrosis es una etapa tardía de la cicatrización (fibrosis) del hígado causada por muchas formas de enfermedades y afecciones hepáticas, como la hepatitis y el alcoholismo crónico.
 
-```{r, warning=FALSE}
-datos = read.csv("cirrhosis.csv", header = T)
-datos = datos %>% as.tibble
-glimpse(datos)
-```
+Nuestro objetivo para este estudio sería estudiar algunos perfiles con riesgo de padecer cirrosis.
 
-Vamos a modificar el data set para que sea más cómodo a la hora de trabajar con él.
-
-Transformamos las variables qualitativas en factor y, en las de Si o No (Y: Si, N: No) cambiamos los valores para que sea más ilustrativa y entendible. De la misma forma con el sexo cromosómico (F: Female, M: Male)
-
-```{r}
-datos = datos %>% 
-  mutate(Status = factor(Status, levels = c("C", "CL", "D"), labels = c("Cens", 
-                                                      "Cens_Trat", "Muerto")))
-
-datos = datos %>% 
-  mutate(Drug = Drug %>% as.factor)
-
-datos = datos %>% 
-  mutate(Sex = if_else(Sex == "F", "Female", "Male") %>% as.factor)
-
-datos = datos %>% 
-  mutate(Ascites = if_else(Ascites == "Y", "Si", "No") %>% as.factor)
-
-datos = datos %>% 
-  mutate(Hepatomegaly = if_else(Hepatomegaly == "Y", "Si", "No") %>% as.factor)
-
-datos = datos %>% 
-  mutate(Spiders = if_else(Spiders == "Y", "Si", "No") %>% as.factor)
-
-datos = datos %>% 
-  mutate(Edema = factor(Edema, levels = c("Y", "N", "S"), labels = c("Si", "No",
-                                                                     "Sin")))
-
-datos = datos %>% 
-  mutate(Stage = Stage %>% as.factor)
-```
-
-Observemos que hay muestras que tienen valores desconocidos (NA). Veamos cuales son:
-
-```{r, echo = FALSE}
-count_NA = function(x){
-  idx = c()
-  for (i in 1:nrow(datos)){
-    if (sum(is.na(datos[i,]))!=0) idx[length(idx)+1] = i
-  }
-  return(idx)
-}
-datos[count_NA(datos),]
-```
-
-```{r}
-datos = na.omit(datos)
-datos
-```
-
-
-
-Ascites
-Hepatomegaly
-Spiders
-Edema
-Stage
-
-
-
-Guardamos el dataset:
-
-```{r}
-write.table(datos, "cirrosis_tidy.csv")
-```
-
-
-Cargamos los datos:
+Recordemos nuestra tabla de datos:
 
 ```{r}
 datos <- read.table("cirrosis_tidy.csv",  header = TRUE )
@@ -131,8 +44,6 @@ datos = datos %>% mutate(Ascites = Ascites %>% as.factor,
 
 glimpse(datos)
 ```
-
-
 El tibble resultante consta de 276 observaciones y 20 variables. Cada muestra representa un paciente al que se le ha extraido la siguiente información:
 
 -   `ID`: Identificador único
@@ -156,11 +67,9 @@ El tibble resultante consta de 276 observaciones y 20 variables. Cada muestra re
 -   `Prothrombin`: Tiempo de Protrombina \[s\]
 -   `Stage`: Estado histórico de la enfermedad (1, 2, 3, or 4)
 
-# Variables
+## Resumen numérico de las variables
 
-Vamos a crear una tabla con la información de cada variable.
-
-Empezamos por las cuantitativas
+- Datos cuantitativos:
 
 ```{r, echo=FALSE}
 # Separamos los datos en variables cuantitativas y cualitativas
@@ -187,78 +96,29 @@ Minimo = round(apply(datos_quant, FUN = min, 2),3)
 Maximo = round(apply(datos_quant, FUN = max, 2),3)
 Desv = round(apply(datos_quant, FUN = sd, 2), 3)
 
-length(Rango)
-
-
-
-
 tabla = data.frame(Unidad, Media, Desv, Minimo, Maximo, Rango)
 
 tabla
 ```
 
-Veamos ahora los datos cualitativos
+- Datos cualitativos:
 
 ```{r, echo=FALSE}
 summary(datos_qual)
 ```
 
-# Estimación del vector de medias y la matriz de covarianza y correlación
-
-Calculemos el vector de medias para cada variable cuantitativa
-
-```{r, echo=FALSE}
-apply(datos_quant, FUN = mean, MARGIN = 2)
-```
-
-Veamos ahora la matriz de covarianza (a secas)
-
-```{r, echo=FALSE, eval =FALSE}
-new_names = substr(names(datos_quant),1,5)
-colnames(datos_quant) = new_names
-```
 
 
-```{r, echo=FALSE}
-n = length(datos$ID)
-
-round(cov(datos_quant)*(n-1)/n,5)
-```
-
-```{r, eval=FALSE, echo=FALSE}
-lims=c(18,30,50,70,Inf)  # esta en anys i noltros tenim en dies
-
-Etiquetas = c("Joven", "Adulto30-50","Adulto50-70","Mayor")
-
-datos$Age = cut(datos$Age, breaks = lims, labels = Etiquetas, right = FALSE)
-```
-
-# Análisis multivariante
-
-```{r, cache = TRUE, warning=FALSE, message=FALSE}
-ggpairs(datos_quant)
-```
-
-```{r, echo=FALSE}
-corPlot(datos_quant, cex = 0.8,  main = "Matriz de correlación", xsrt = 50, 
-        labels = c("N_Days", "Age", "Bili", "Chol", "Album", "Copper",
-                   "Alk_Ph", "SGOT", "Tryg", "Plate", "Proth"))
-```
-
-# Análisis de normalidad multivariante
+## Análisis de normalidad multivariante
 
 Con estos datos vamos a realizar nuestro estudio de normalidad multivariante.
 
 Calculemos el vector de medias
 
-```{r}
-Medias = colMeans(datos_quant)
-```
+```{r, echo = FALSE}
+Medias = colMeans(datos_quant) # vector de medias
 
-la matriz de covarianza:
-
-```{r}
-S = cov(datos_quant)
+S = cov(datos_quant) # matriz de covarianza
 ```
 
 y la distancia de Mahalanobis:
@@ -270,15 +130,19 @@ d_Mahalanobis = apply(datos_quant, MARGIN = 1, function(x)
 
 Una vez calculadas estas medidas, representemos los datos
 
-```{r}
+```{r, echo=FALSE}
 plot(qchisq((1:nrow(datos_quant) - 1/2) / nrow(datos_quant), df = 3), sort(d_Mahalanobis), xlab = expression(paste("Cuantiles de la ", chi[20]^2)),ylab="Distancias ordenadas")
 abline(a=0,b=1)
 ```
+Notemos que no sigue una Chi-cuadrado, i por tanto los datos tampoco siguen una normal multivariante.
 
-Vamos a realizar un test de normalidad. Utilizaremos Shapiro-Wilk:
+Vamos a realizar un test de normalidad para confirmarlo. Utilizaremos Shapiro-Wilk:
 
 ```{r}
 mvnormtest::mshapiro.test(t(datos_quant))
 ```
 
 Obtenemos un p-valor muy pequeño, prácticamente 0, entonces, rechazamos la hipótesis nula y concluimos que no hay normalidad multivariante, es decir, almenos una variable individual no se distribuye normalmente.
+
+
+# 
