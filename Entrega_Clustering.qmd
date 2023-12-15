@@ -189,7 +189,7 @@ fviz_nbclust(x = cX, FUNcluster = kmeans, method = "wss",
 
 ```{r}
 #set.seed(2312)
-km_clusters <- kmeans(x = cX, centers = 4, nstart = 78)
+km_clusters <- kmeans(x = cX, centers = 3, nstart = 78)
 
 fviz_cluster(object = km_clusters, data = cX, show.clust.cent = TRUE, geom ="point",
  ellipse.type = "euclid", star.plot = TRUE, repel = TRUE) +
@@ -209,7 +209,7 @@ En este caso, cada cluster está representado por una observación presente en e
 
 ```{r, warning=FALSE}
 fviz_nbclust(x = cX, FUNcluster = pam, method = "wss",
- diss = dist(datos, method = "manhattan"))+
+ diss = dist(datos, method = "euclidean")) +
   geom_vline(xintercept = 6, linetype = 2)
 ```
 
@@ -228,14 +228,174 @@ set.seed(101)
 hc_completo <- datos_quant %>% scale() %>% dist(method = "euclidean") %>%
  hclust(method = "complete")
 fviz_dend(x = hc_completo, k = 3, cex = 0.6) +
- geom_hline(yintercept = 5.5, linetype = "dashed")
+ geom_hline(yintercept = 10.5, linetype = "dashed")
 ```
 
 
 
+## Análisis de Componentes Principales
 
-# ACP
+Calculamos las componentes principales con el comando `prcomp` utilizando nuestro dataset, sin escalar los datos ya que están todos en la misma escala. Por último, los consideramos centrados en el 0.
 
+```{r}
+datos.acp=prcomp(cX, scale = FALSE, center = FALSE)
+```
+
+Los valores propios muestran el porcentaje de varianza explicada por cada componente principal.
+
+```{r, echo=FALSE}
+lambdas = get_eigenvalue(datos.acp)
+round(lambdas, 5)
+```
+
+Notemos que usando las 2 primeras componentes principales explican aproximadamente el 93.3% de los datos. Veamos el gráfico del codo:
+
+```{r, echo=FALSE}
+fviz_eig(datos.acp, addlabels = TRUE, ylim=c(0,100))
+```
+
+Efectivamente, viendo el gráfico y utilizando el criterio del codo, nos quedaremos con las dos primeras componentes principales.
+
+Realicemos un gráfico de círculo de correlación variable para ver como se agrupan las variables y la calidad de representación que tienen.
+
+```{r, echo=FALSE}
+fviz_pca_var(datos.acp, axes = c(1,2), col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE)
+```
+
+
+
+Para corroborar numéricamente la calidad de representación, realizaremos un gráfico de cos2.
+
+```{r, echo=FALSE}
+var <- get_pca_var(datos.acp)
+fviz_cos2(datos.acp, choice = "var", axes = 1:2)
+```
+
+Efectivamente, las tres primeras variables tienen un cos2 alto, por tanto estas bien representadas. En cambio, las otras variables tienen un valor de cos2 prácticamente nulo, indica que estas variables no estan bien representadas por las componentes principales.
+
+Para ver como se relacionan las componentes principales con los datos originales, veamos los autovectores.
+
+```{r, echo=FALSE}
+round(datos.acp$rotation,4)
+```
+
+Observemos que la primera componente principal da un peso muy elevado y positivo a la variable `Agrucultura`, y de signo contrario a las demás (excepto `Mineria` con un peso muy bajo).
+
+Respecto a la segunda componente principal, representa sobretodo a `Fábrica` y a `Servicios Sociales y Personales` (con signos opuestos pero un peso elevado).
+
+Ahora, vamos a realizar un `biplot`, que nos permitirá visualizar las variables originales y las observaciones transformadas en los ejes de componentes principales.
+
+```{r, echo=FALSE}
+fviz_pca_biplot(datos.acp,  repel = TRUE,
+                col.var = "#2E9FDF", # color para las variables
+                col.ind = "#696969"  # color para las observaciones
+                )
+```
+
+De nuevo, se aprecia como la variable `Agricultura` es la mejor representada debido a la longitud de la flecha. Le siguen las variables de `Fábricas` y `Servicios Sociales y Personales`, mejor representadas por la segunda componente.
+
+### Resultados del Análisis
+
+Llegado a este punto, vamos a comprobar numéricamente todas las conclusiones que hemos sacado anteriormente. Realmente basta restringirnos a las dos primeras componentes principales ya que en el estudio hemos decidido utilizar solamente estas dos.
+
+#### Resultados por Variables
+
+Empezamos por las contribuciones de las variables a las componentes principales.
+
+```{r, echo=FALSE}
+res.var=get_pca_var(datos.acp)
+round(res.var$contrib, 4)      # Contribuciones a las CP
+```
+
+Tambien apreciamos la calidad de representación de las variables a las componentes principales.
+
+```{r, echo=FALSE}
+round(res.var$cos2, 5)
+```
+
+Respecto a las variables, hemos podido comprobar lo expuesto anteriormente, se aprecia una fuerte contribución de la variable `Agricultura` a la primera componente principal, además de una muy buena representación (un valor de cos2 muy elevado).
+
+Seguidamente, la variable `Fábricas` tiene gran contribución a la segunda componente principal, con menor representación debido al valor de cos2 y que también contribuye a la primera componente principal, pero muy poco. En cambio, la variable `Servicios sociales y Personales` tiene más poca contribución a la segunda componente, pero está algo mejor representada por la primera que la variable anterior; de todos modos, la calidad de representación es más baja que las anteriores.
+
+No podemos destacar más variables ya que, como vimos en los gráficos, no habia prácticamente representación por parte de las componentes principales.
+
+#### Resultados por Observaciones
+
+Ahora, respecto a las observaciones, empezamos por las coordenadas.
+
+```{r, echo=FALSE}
+res.obs=get_pca_ind(datos.acp)
+round(res.obs$coord, 2)  #Coordenadas
+```
+
+También las contribuciones de cada observación a las componentes principales.
+
+```{r, echo=FALSE}
+round(res.obs$contrib,2)  #Contribuciones a las CP
+```
+
+Por último, la calidad de representación, es decir, el valor de cos2.
+
+```{r, echo=FALSE}
+round(res.obs$cos2,3)  # Calidad de la representación
+```
+
+### Grupos
+
+Vamos a tratar de determinar grupos de países con comportamientos semejantes en la distribución de su fuerza de trabajo.
+
+El criterio que seguiremos es separar las observaciones dependiendo de su contribucón a las componentes principales. Como la variable `Agricultura` es la que tiene una mayor representación, uno de los grupos estará formado por los paises cuya mayor fuerza de trabajo se basa en la agricultura. Para determinar este grupo, consideraremos los paises que tienen coordenada positiva en el eje de la primera componente principal.
+
+Las otras dos variables mejor representadas son `Fábricas` y `Servicios Sociales y Personales`. La relación de estas variables con la primera componente principal es negativa, así que consideramos el resto de paises para clasificar en estos dos grupos. Esta clasificación se va a determinar mediante la segunda componente principal: la relación de `Fábricas` con la componente principal es positiva, mientras que con la otra variable es negativa. Por tanto, utilizaremos estas condiciones para dividir los paises.
+
+```{r, echo=FALSE}
+coord = data.frame(res.obs$coord[, c(1,2)])
+coord = coord %>% 
+  mutate(Grupos = if_else(Dim.1 > 0, "Grupo 1", if_else(Dim.2 > 0, "Grupo 2", "Grupo 3")))
+coord
+```
+
+Añadimos este factor a nuestra tabla de datos original y realizamos un gráfico para visualizar la división de los grupos.
+
+```{r, echo=FALSE}
+datos = datos %>% 
+  mutate(Grupo = as.factor(coord$Grupos))
+glimpse(datos)
+```
+
+```{r, echo=FALSE}
+autoplot(datos.acp, data = datos, colour = 'Grupo',
+         loadings = TRUE, loadings.colour = 'blue',
+         loadings.label = FALSE, loadings.label.size = 3, size = 3) +
+  geom_text_repel(aes(label = rownames(datos)), box.padding = 0.5, segment.color = "darkgrey", size = 3, color = "darkgrey") +
+  theme_bw()
+```
+
+Veamos en un mapa de Europa con los paises pintados en función del grupo al cual le hemos asignado:
+
+![](Europa%20Map%20Chart.png)
+
+Nota: Como los datos se tomaron en 1979, el mapa de Europa ha cambiado respecto al actual. Algunos paises se han fragmentado y otros se han unido. En concreto:
+
+-   Debido a la separación de Alemania por muro de Berlín después de la Seguna Guerra Mundial se diferenció entre Alemania Oriental y Alemania Occidental (hasta 1989, que se volvió a unir en un solo estado). Por tanto, en el mapa solo hemos considerado Alemania.
+
+-   Hay una muestra llamada "Checoslovaquia", que actualmente este estado esta separado en Republica Checa y Eslovaquia (separación en 1992).
+
+-   Del mismo modo aparece la Unión Sovietica, cuyos paises que la conformaban son: Rusia, Transcaucásicas (Armenia, Azerbayán y Georgia), Ucrania y Bielorrusia (disolución en 1991).
+
+-   Por último tenemos Yugoslavia: Bosnia y Herzegovina, Croacia, Eslovenia, Macedonia, Montenegro y Serbia (disolución en 1992).
+
+A la hora de pintar el mapa, todos los paises actuales que formaban parte de algun estado mencionado anteriormente se han coloreado del mismo color que el estado al que pertenecían. Por tanto, las conclusiones que se extraen no son actuales ya que cada país ahora es independiente.
+
+### Conclusión
+
+-   Usando el método de componentes principales hemos podido reducir el número de variables a 2, ya que explican aproximadamente el 93.3% de los datos.
+
+-   Las variables iniciales que mejor se han podido describir con las dos componentes principales han sido `Agricultura`, `Fábrica` y `Servicios Sociales y Personales`.
+
+-   Hemos podido establecer 3 grupos de paises con comportamientos semejantes en función de si su fuerza de trabajo se distribuía más en `Agricultura` (Grupo 1), `Fábrica` (Grupo 2) y `Servicios Sociales y Personales` (Grupo 3).
 
 
 
