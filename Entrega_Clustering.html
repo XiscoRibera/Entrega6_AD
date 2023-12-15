@@ -87,12 +87,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#resumen-numérico-de-las-variables" id="toc-resumen-numérico-de-las-variables" class="nav-link" data-scroll-target="#resumen-numérico-de-las-variables">Resumen numérico de las variables</a></li>
   <li><a href="#análisis-de-normalidad-multivariante" id="toc-análisis-de-normalidad-multivariante" class="nav-link" data-scroll-target="#análisis-de-normalidad-multivariante">Análisis de normalidad multivariante</a></li>
   </ul></li>
-  <li><a href="#clusterning" id="toc-clusterning" class="nav-link" data-scroll-target="#clusterning">Clusterning</a>
+  <li><a href="#clustering" id="toc-clustering" class="nav-link" data-scroll-target="#clustering">Clustering</a>
   <ul>
   <li><a href="#k-means" id="toc-k-means" class="nav-link" data-scroll-target="#k-means">K-means</a></li>
   <li><a href="#k-medoids-pam" id="toc-k-medoids-pam" class="nav-link" data-scroll-target="#k-medoids-pam">K-medoids (PAM)</a></li>
   <li><a href="#dendograma" id="toc-dendograma" class="nav-link" data-scroll-target="#dendograma">Dendograma</a></li>
   </ul></li>
+  <li><a href="#acp" id="toc-acp" class="nav-link" data-scroll-target="#acp">ACP</a></li>
   </ul>
 </nav>
 </div>
@@ -272,8 +273,8 @@ W = 0.83366, p-value &lt; 2.2e-16</code></pre>
 <p>Obtenemos un p-valor muy pequeño, prácticamente 0, entonces, rechazamos la hipótesis nula y concluimos que no hay normalidad multivariante, es decir, almenos una variable individual no se distribuye normalmente.</p>
 </section>
 </section>
-<section id="clusterning" class="level1">
-<h1>Clusterning</h1>
+<section id="clustering" class="level1">
+<h1>Clustering</h1>
 <p>En primer lugar vamos a tipificar o escalar nuestros datos para que esten todos a la misma escala:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>datos2 <span class="ot">&lt;-</span> datos_quant <span class="sc">%&gt;%</span> <span class="fu">scale</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -307,10 +308,9 @@ W = 0.83366, p-value &lt; 2.2e-16</code></pre>
 <p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Observemos que el número óptimo para aplicar el kmeans és <span class="math inline">\(4\)</span>, ya que con <span class="math inline">\(5\)</span> el error aumenta y con <span class="math inline">\(6\)</span> el error es practicamente igual que con <span class="math inline">\(4\)</span>. Por tanot procedamos a hacer un <code>kmeans()</code> con <span class="math inline">\(k=4\)</span>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#set.seed(2312)</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>km_clusters <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(<span class="at">x =</span> cX, <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">100</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>km_clusters <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(<span class="at">x =</span> cX, <span class="at">centers =</span> <span class="dv">4</span>, <span class="at">nstart =</span> <span class="dv">78</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(<span class="at">object =</span> km_clusters, <span class="at">data =</span> cX, <span class="at">show.clust.cent =</span> <span class="cn">TRUE</span>, <span class="at">geom =</span><span class="st">"point"</span>,</span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a> <span class="at">ellipse.type =</span> <span class="st">"euclid"</span>, <span class="at">star.plot =</span> <span class="cn">TRUE</span>, <span class="at">repel =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
@@ -324,31 +324,33 @@ W = 0.83366, p-value &lt; 2.2e-16</code></pre>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>km_clusters</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>K-means clustering with 3 clusters of sizes 42, 172, 62
+<pre><code>K-means clustering with 4 clusters of sizes 33, 65, 18, 160
 
 Cluster means:
-      N_Days        Age  Bilirubin Cholesterol     Albumin     Copper
-1 -0.2546448 -0.2545987  1.2382451   1.4602861 -0.04211999  0.8032124
-2  0.3710111 -0.2384028 -0.4226714  -0.2394504  0.35876330 -0.4164815
-3 -0.8567552  0.8338456  0.3337611  -0.3249442 -0.96674595  0.6112887
-      Alk_Phos       SGOT Tryglicerides  Platelets Prothrombin
-1  0.925083251  0.9034874     1.2272678  0.3890122   0.1182713
-2 -0.222970659 -0.2934388    -0.2586557  0.1226895  -0.3315874
-3 -0.008105534  0.2020161    -0.1138141 -0.6038889   0.8397685
+      N_Days        Age   Bilirubin Cholesterol    Albumin     Copper
+1 -0.8145378 -0.2252394  1.97179303  1.65776521 -0.4367999  1.1626519
+2 -0.6848078  0.9183716  0.08563146 -0.30089006 -0.7830395  0.3721280
+3  0.9759352  0.0137912 -0.26571723 -0.05600686  0.1066937  0.3078817
+4  0.3364089 -0.3281844 -0.41157691 -0.21337671  0.3961967 -0.4256106
+    Alk_Phos        SGOT Tryglicerides  Platelets Prothrombin
+1  0.2480136  1.05417723     1.2717643  0.1143846   0.4245988
+2 -0.1693871  0.08382329    -0.2560743 -0.5564107   0.6666422
+3  3.0636206  0.10153560     0.2735120  0.4057155   0.1135486
+4 -0.3269966 -0.26290002    -0.1890413  0.1568070  -0.3711711
 
 Clustering vector:
-  [1] 3 2 3 3 2 2 2 2 3 2 3 2 2 2 3 3 2 3 2 3 1 1 2 1 3 3 2 3 1 2 3 2 1 2 3 2 2
- [38] 2 2 1 2 1 2 2 1 3 1 1 3 2 2 2 3 1 3 2 2 1 2 1 2 2 2 1 1 3 3 3 2 3 1 1 2 2
- [75] 2 1 2 2 2 2 3 3 2 3 3 2 2 3 2 2 3 2 2 3 2 2 2 2 2 2 2 2 1 1 2 2 1 3 2 2 2
-[112] 2 1 3 2 2 2 2 2 2 1 3 2 2 2 2 1 2 2 1 3 2 3 2 3 2 1 2 2 2 2 2 3 2 3 1 2 2
-[149] 2 2 2 2 2 2 2 2 2 1 2 3 1 2 2 1 2 1 2 2 2 2 2 2 2 2 2 2 2 2 3 2 2 2 2 2 1
-[186] 1 2 3 2 3 3 2 2 2 2 2 3 2 3 2 3 2 1 2 3 3 2 1 3 3 1 2 2 1 2 2 2 2 2 3 2 2
-[223] 2 2 2 3 3 2 2 3 2 2 3 3 2 2 2 2 2 2 2 2 1 2 2 3 2 2 2 2 2 3 2 2 2 2 1 3 1
-[260] 2 2 3 2 2 2 2 3 2 1 2 2 2 3 3 2 1
+  [1] 2 3 2 2 4 4 4 4 2 4 2 4 3 4 2 1 4 2 4 2 1 3 4 1 1 1 3 2 3 3 2 4 3 4 2 4 3
+ [38] 3 4 3 4 3 4 4 3 3 3 3 3 3 4 4 2 1 2 4 4 4 4 1 4 4 4 1 1 1 2 2 4 2 1 4 2 4
+ [75] 4 1 4 4 4 4 2 2 4 2 2 4 4 2 4 4 2 4 4 2 4 4 4 4 2 2 4 4 4 1 4 4 1 2 4 4 4
+[112] 4 1 2 4 4 4 4 4 4 1 2 4 4 4 4 1 4 2 1 2 4 2 4 2 4 1 4 4 4 4 4 2 4 2 1 4 4
+[149] 4 4 4 4 4 4 4 4 4 1 4 2 1 2 4 1 4 1 4 4 2 4 4 4 4 4 4 4 4 4 2 4 4 4 4 4 1
+[186] 1 4 2 4 2 2 4 4 4 2 4 2 4 2 4 2 4 1 4 2 2 4 1 2 2 1 4 4 1 4 4 4 4 2 2 4 4
+[223] 4 4 4 2 2 4 4 2 4 4 2 2 2 4 4 4 4 4 4 4 4 4 4 1 4 4 4 4 4 2 4 2 4 4 4 2 1
+[260] 4 4 2 4 4 4 4 2 4 3 4 4 4 2 2 4 1
 
 Within cluster sum of squares by cluster:
-[1] 747.2106 942.1056 573.4397
- (between_SS / total_SS =  25.2 %)
+[1] 569.8545 496.5778 168.6651 824.1182
+ (between_SS / total_SS =  31.9 %)
 
 Available components:
 
@@ -398,6 +400,9 @@ of ggplot2 3.3.4.
 </div>
 </div>
 </section>
+</section>
+<section id="acp" class="level1">
+<h1>ACP</h1>
 </section>
 
 </main>

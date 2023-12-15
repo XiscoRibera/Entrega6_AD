@@ -25,7 +25,6 @@ library(stats)
 library(cluster)
 ```
 
-
 # Recordatorio
 
 Vamos a tratar una base de datos relacionados con la predicción de riesgo de cirrosis. La cirrosis es una etapa tardía de la cicatrización (fibrosis) del hígado causada por muchas formas de enfermedades y afecciones hepáticas, como la hepatitis y el alcoholismo crónico.
@@ -48,6 +47,7 @@ datos = datos %>% mutate(Ascites = Ascites %>% as.factor,
 
 glimpse(datos)
 ```
+
 El tibble resultante consta de 276 observaciones y 20 variables. Cada muestra representa un paciente al que se le ha extraido la siguiente información:
 
 -   `ID`: Identificador único
@@ -73,7 +73,7 @@ El tibble resultante consta de 276 observaciones y 20 variables. Cada muestra re
 
 ## Resumen numérico de las variables
 
-- Datos cuantitativos:
+-   Datos cuantitativos:
 
 ```{r, echo=FALSE}
 # Separamos los datos en variables cuantitativas y cualitativas
@@ -105,13 +105,11 @@ tabla = data.frame(Unidad, Media, Desv, Minimo, Maximo, Rango)
 tabla
 ```
 
-- Datos cualitativos:
+-   Datos cualitativos:
 
 ```{r, echo=FALSE}
 summary(datos_qual)
 ```
-
-
 
 ## Análisis de normalidad multivariante
 
@@ -138,6 +136,7 @@ Una vez calculadas estas medidas, representemos los datos
 plot(qchisq((1:nrow(datos_quant) - 1/2) / nrow(datos_quant), df = 3), sort(d_Mahalanobis), xlab = expression(paste("Cuantiles de la ", chi[20]^2)),ylab="Distancias ordenadas")
 abline(a=0,b=1)
 ```
+
 Notemos que no sigue una Chi-cuadrado, i por tanto los datos tampoco siguen una normal multivariante.
 
 Vamos a realizar un test de normalidad para confirmarlo. Utilizaremos Shapiro-Wilk:
@@ -148,8 +147,7 @@ mvnormtest::mshapiro.test(t(datos_quant))
 
 Obtenemos un p-valor muy pequeño, prácticamente 0, entonces, rechazamos la hipótesis nula y concluimos que no hay normalidad multivariante, es decir, almenos una variable individual no se distribuye normalmente.
 
-
-# Clusterning
+# Clustering
 
 En primer lugar vamos a tipificar o escalar nuestros datos para que esten todos a la misma escala:
 
@@ -168,16 +166,15 @@ Hn <- diag(n)-1/n # matriz de centrado
 cX <- Hn%*%X # matriz centrada
 ```
 
-
 ```{r}
 mat_dist <- dist(x = cX, method = "euclidean")
 ```
-
 
 ```{r, cache = TRUE}
 fviz_dist(dist.obj = mat_dist, lab_size = 5) +
  theme(legend.position = "none")
 ```
+
 ## K-means
 
 En nuestro caso, no sabemos cuantos clusters o grupos esta dividido nuestro dataset. Por tanto vamos a estimar al número $k$ óptimo para aplicar el `kmeans()`. Para ello utilizaremos la función `fviz_nbclust()`:
@@ -189,21 +186,18 @@ fviz_nbclust(x = cX, FUNcluster = kmeans, method = "wss",
 
 ```
 
-Observemos que el número óptimo para aplicar el kmeans és $4$, ya que con $5$ el error aumenta y con $6$ el error es practicamente igual que con $4$. Por tanot procedamos a hacer un `kmeans()` con $k=4$:
-
 
 ```{r}
 #set.seed(2312)
-km_clusters <- kmeans(x = cX, centers = 3, nstart = 100)
+km_clusters <- kmeans(x = cX, centers = 4, nstart = 78)
 
 fviz_cluster(object = km_clusters, data = cX, show.clust.cent = TRUE, geom ="point",
  ellipse.type = "euclid", star.plot = TRUE, repel = TRUE) +
 theme_bw() +
 theme(legend.position = "none")
 ```
-Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente
-realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2)
 
+Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2)
 
 ```{r}
 km_clusters
@@ -211,15 +205,13 @@ km_clusters
 
 ## K-medoids (PAM)
 
-En este caso, cada cluster está representado por una observación presente en el cluster (medoid), mientras que en K-means cada cluster está representado por su centroide,
-que se corresponde con el promedio de todas las observaciones del cluster pero con ninguna en particular.
+En este caso, cada cluster está representado por una observación presente en el cluster (medoid), mientras que en K-means cada cluster está representado por su centroide, que se corresponde con el promedio de todas las observaciones del cluster pero con ninguna en particular.
 
 ```{r, warning=FALSE}
 fviz_nbclust(x = cX, FUNcluster = pam, method = "wss",
  diss = dist(datos, method = "manhattan"))+
   geom_vline(xintercept = 6, linetype = 2)
 ```
-
 
 ```{r}
 pam_clusters <- pam(x = cX, k = 3, metric = "euclidean")
@@ -228,6 +220,7 @@ fviz_cluster(object = pam_clusters, data = cX, ellipse.type = "t", geom = "point
   theme_bw() + 
   theme(legend.position = "none")
 ```
+
 ## Dendograma
 
 ```{r, cache =TRUE}
@@ -237,4 +230,25 @@ hc_completo <- datos_quant %>% scale() %>% dist(method = "euclidean") %>%
 fviz_dend(x = hc_completo, k = 3, cex = 0.6) +
  geom_hline(yintercept = 5.5, linetype = "dashed")
 ```
+
+
+
+
+# ACP
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
