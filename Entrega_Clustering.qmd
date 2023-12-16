@@ -200,12 +200,12 @@ fviz_nbclust(x = cX, FUNcluster = kmeans, method = "gap_stat")
 
 Con el método de la silueta, nos sugiere escoger $k=2$, en cambio, con el siguiente, nos sugiere 8 clusters. Como no hemos salido de dudas, vamos a realizar otro experimento: vamos a realizar una función que nos proporciona 30 índices para determinar el número de clusters.
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 resnumclust = NbClust(data = cX, distance = "euclidean", min.nc = 2, max.nc = 10, 
                       method = "kmeans", index = "alllong")
 ```
 
-```{r, echo=FALSE, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 # fix the functions
 fviz_nbclust <- function (x, FUNcluster = NULL, method = c("silhouette", "wss", 
                                            "gap_stat"), diss = NULL, k.max = 10, nboot = 100, verbose = interactive(), 
@@ -314,7 +314,7 @@ environment(.viz_NbClust) <- asNamespace("factoextra")
 assignInNamespace(".viz_NbClust",.viz_NbClust,"factoextra")
 ```
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 fviz_nbclust(resnumclust)
 ```
 
@@ -337,14 +337,6 @@ theme(legend.position = "none")
 
 Como podemos ver, al menos en la proyección en 2 dimensiones, hay bastante solapamiento. Además, si vemos la zona pintada como si fuera un intervalo de confianza, hay muchas observaciones que quedan fuera.
 
-### Dendograma
-
-Visualicemos un dendograma para ver estas particiones en los datos.
-
-```{r, cache = TRUE}
-res = hcut(cX, k=4, stand = TRUE)
-fviz_dend(res, rect = TRUE, cex = 0.5, k_colors = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8"))
-```
 
 Ahora bien, sería interesante ver si estos clusters corresponden a las fases de cirrosis segun la variable `stage`.
 
@@ -356,7 +348,6 @@ id_stage = datos %>%
 Cluster = km_clusters$cluster %>% as.factor()
 
 tabla_cluster = cbind(id_stage, Cluster)
-tabla_cluster
 
 table(x = tabla_cluster[,c(2,3)])
 ```
@@ -386,7 +377,7 @@ fviz_nbclust(x = cX, FUNcluster = pam, method = "gap_stat",
 
 Estos dos métodos nos sugieren 2 clusters para realizar el análisis. Como en `kmeans`, podemos utilizar la misma función para corroborarlo con 30 índices, utilizando el método `median`, que es el más indicado para medoides:
 
-```{r, cache=TRUE}
+```{r, cache=TRUE,, eval=FALSE}
 resnumclust2 = NbClust(data = cX, distance = "euclidean", min.nc = 2, max.nc = 10, 
                       method = "median", index = "alllong")
 ```
@@ -408,11 +399,13 @@ fviz_cluster(object = pam_clusters, data = cX, ellipse.type = "t", geom = "point
 
 Estan bastante solapados, puede deberse a la proyección a dos dimensiones.
 
+```{r, cache =TRUE, eval=FALSE, echo=FALSE}
+
 ### Dendograma
 
-Visualicemos un dendograma que nos ayude a observar la clasificación:
+#Visualicemos un dendograma que nos ayude a observar la clasificación:
 
-```{r, cache =TRUE}
+
 hc_completo <- datos_quant %>% scale() %>% dist(method = "euclidean") %>%
  hclust(method = "complete")
 fviz_dend(x = hc_completo, k = 2, cex = 0.6) +
@@ -422,11 +415,89 @@ fviz_dend(x = hc_completo, k = 4, cex = 0.6) +
  geom_hline(yintercept = 9.2, linetype = "dashed")
 ```
 
-Hay un cluster mucho más grande que el otro. Podríamos mirar si se corresponde con algun factor, y poder definir algunos perfiles.
 
 ## Clara
 
-## Análisis de Componentes Principales
+
+
+## Dendograma
+
+Por útimo, realicemos un dendograma para ver como se van formando los clusters, con el algoritmo *agglomerative hierarchical clustering*. 
+
+Como sabemos, existen diferentes tipos de dendogramas en función del tipo de distancia entre cluster que se escoja. Recordemos cuales son:
+
+- **Complete or Maximum:** Se calcula la distancia entre todos los posibles pares formados por una observación del cluster A y una del cluster B. La mayor de todas ellas se selecciona como la distancia entre los dos clusters.
+
+- **Single or Minimum:** Se calcula la distancia entre todos los posibles pares formados por una observación del cluster A y una del cluster B. La menor de todas ellas se selecciona como la distancia entre los dos clusters.
+
+- **Average:** Se calcula la distancia entre todos los posibles pares formados por una observación del cluster A y una del cluster B. El valor promedio de todas ellas se selecciona como la distancia entre los dos clusters.
+
+- **Centroid:** Se calcula el centroide de cada uno de los clusters y se selecciona la distancia entre ellos como la distancia entre los dos clusters.
+
+- **Ward:** Se trata de un método general. La selección del par de clusters que se combinan en cada paso del agglomerative hierarchical clustering se basa en el valor óptimo de una función objetivo, pudiendo ser esta última cualquier función definida por el analista. Un caso particular es *Ward's minimum variance*, en cada paso se identifican aquellos 2 clusters cuya fusión conlleva menor incremento de la varianza total intra-cluster.
+
+Realicemos unos cuantos dendogramas:
+
+- Dendograma para 4 clusters con distancia entre clusters *Complete or Maximum*:
+
+```{r, cache=TRUE, warning=FALSE}
+hc_completo <- mat_dist %>%
+  hclust(method = "complete") # Complete or Maximum
+
+fviz_dend(x = hc_completo, k = 4, cex = 0.6) +
+  geom_hline(yintercept = 11.2, linetype = "dashed") +
+  geom_hline(yintercept = 9.6, linetype = "dashed")
+```
+
+- Dendograma para 4 clusters con distancia entre clusters *Single or Minimum*:
+
+
+```{r, cache=TRUE, warning=FALSE}
+hc_single <- mat_dist %>%
+  hclust(method = "single") # Single or Minimum
+
+fviz_dend(x = hc_single, k = 4, cex = 0.6) +
+ geom_hline(yintercept = 5.9, linetype = "dashed")+
+  geom_hline(yintercept = 5.1, linetype = "dashed")
+```
+
+- Dendograma para 4 clusters con distancia entre clusters *Average*:
+
+```{r, cache=TRUE, warning=FALSE}
+hc_average <- mat_dist %>%
+  hclust(method = "average") # Average
+
+fviz_dend(x = hc_average, k = 4, cex = 0.6) +
+ geom_hline(yintercept = 8.8, linetype = "dashed")+
+  geom_hline(yintercept = 7, linetype = "dashed")
+```
+
+- Dendograma para 4 clusters con distancia entre clusters *Ward's minimum variance*:
+
+```{r, cache=TRUE}
+hc_ward_D2 <- mat_dist %>%
+  hclust(method = "ward.D2") # Average
+
+fviz_dend(x = hc_ward_D2, k = 4, cex = 0.6) +
+ geom_hline(yintercept = 25, linetype = "dashed")+
+  geom_hline(yintercept = 18, linetype = "dashed")
+```
+- Observemos que al tener muchas observaciones no podemos distinguirlas. Aun así nos podemos hacer una idea del tamaño de cada cluster. 
+
+- Observamos que en nuestros datos los clusters que se forman dependen mucho de la distancia entre clusters que se escoja. Esto puede indicar que los datos no esten distribuidos en grupos bien diferenciados.
+
+- Observamos que si cortamos más arriba el dendograma (la línea más alta), podemos ver cuales son los clusters que se juntan si quisiéramos solo 2 clusters.
+
+
+```{r, cache = TRUE, echo=FALSE}
+#res = hcut(cX, k=4, stand = TRUE)
+#fviz_dend(res, rect = TRUE, cex = 0.5, k_colors = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8"))
+```
+
+
+
+
+# Análisis de Componentes Principales
 
 Calculamos las componentes principales con el comando `prcomp` utilizando nuestro dataset, sin escalar los datos ya que están todos en la misma escala. Por último, los consideramos centrados en el 0.
 
