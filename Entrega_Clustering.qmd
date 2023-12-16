@@ -151,10 +151,6 @@ mvnormtest::mshapiro.test(t(datos_quant))
 
 Obtenemos un p-valor muy pequeño, prácticamente 0, entonces, rechazamos la hipótesis nula y concluimos que no hay normalidad multivariante, es decir, almenos una variable individual no se distribuye normalmente.
 
-
-
-
-
 # Clustering
 
 Vamos a guardar en un nuevo dataset las variables cuantitativas. Vamos a tipificar o escalar nuestros datos para que esten todos a la misma escala:
@@ -191,28 +187,25 @@ En nuestro caso, no sabemos en cuantos clusters o grupos esta dividido nuestro d
 fviz_nbclust(x = cX, FUNcluster = kmeans, method = "wss",
  diss = dist(cX, method = "euclidean"))
 ```
-Realmente, con el método del codo, es un poco complicado establemcer un $k$ óptimo, así que vamos a utilizar otros métodos que nos proporciona `R`:
 
+Realmente, con el método del codo, es un poco complicado establemcer un $k$ óptimo, así que vamos a utilizar otros métodos que nos proporciona `R`:
 
 ```{r}
 fviz_nbclust(x = cX, FUNcluster = kmeans, method = "silhouette")
 ```
 
-
 ```{r}
 fviz_nbclust(x = cX, FUNcluster = kmeans, method = "gap_stat")
 ```
 
-
 Con el método de la silueta, nos sugiere escoger $k=2$, en cambio, con el siguiente, nos sugiere 8 clusters. Como no hemos salido de dudas, vamos a realizar otro experimento: vamos a realizar una función que nos proporciona 30 índices para determinar el número de clusters.
 
-```{r, cache=TRUE,eval=FALSE}
+```{r, cache=TRUE}
 resnumclust = NbClust(data = cX, distance = "euclidean", min.nc = 2, max.nc = 10, 
                       method = "kmeans", index = "alllong")
 ```
 
-
-```{r, echo=FALSE}
+```{r, echo=FALSE, cache=TRUE}
 # fix the functions
 fviz_nbclust <- function (x, FUNcluster = NULL, method = c("silhouette", "wss", 
                                            "gap_stat"), diss = NULL, k.max = 10, nboot = 100, verbose = interactive(), 
@@ -321,13 +314,9 @@ environment(.viz_NbClust) <- asNamespace("factoextra")
 assignInNamespace(".viz_NbClust",.viz_NbClust,"factoextra")
 ```
 
-
-
-
 ```{r, cache=TRUE}
 fviz_nbclust(resnumclust)
 ```
-
 
 Vamos a calcular las 4 k-medias con nuestros datos y con 30 iteraciones. Además, vamos a visualizar como ha quedado la partición.
 
@@ -345,18 +334,17 @@ fviz_cluster(object = km_clusters, data = cX, show.clust.cent = TRUE, geom ="poi
 theme_bw() +
 theme(legend.position = "none")
 ```
+
 Como podemos ver, al menos en la proyección en 2 dimensiones, hay bastante solapamiento. Además, si vemos la zona pintada como si fuera un intervalo de confianza, hay muchas observaciones que quedan fuera.
 
 ### Dendograma
 
 Visualicemos un dendograma para ver estas particiones en los datos.
 
-```{r, cache =TRUE}
+```{r, cache = TRUE}
 res = hcut(cX, k=4, stand = TRUE)
 fviz_dend(res, rect = TRUE, cex = 0.5, k_colors = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8"))
 ```
-
-
 
 Ahora bien, sería interesante ver si estos clusters corresponden a las fases de cirrosis segun la variable `stage`.
 
@@ -372,11 +360,8 @@ tabla_cluster
 
 table(x = tabla_cluster[,c(2,3)])
 ```
+
 FATAL
-
-
-
-
 
 ## K-medoids (PAM)
 
@@ -386,6 +371,7 @@ En este caso, cada cluster está representado por una observación presente en e
 fviz_nbclust(x = cX, FUNcluster = pam, method = "wss",
  diss = dist(datos, method = "manhattan"))
 ```
+
 Encontramos codos en $k=2$, $k=4$ y uno muy pronunciado en $k=6$. Para ver cual sería óptimo, como en el caso anterior, visualicemos otros métodos como el de la silueta i gap_stat.
 
 ```{r, warning=FALSE}
@@ -393,25 +379,23 @@ fviz_nbclust(x = cX, FUNcluster = pam, method = "silhouette",
  diss = dist(datos, method = "manhattan"))
 ```
 
-
 ```{r, warning=FALSE}
 fviz_nbclust(x = cX, FUNcluster = pam, method = "gap_stat",
  diss = dist(datos, method = "manhattan"))
 ```
 
-
 Estos dos métodos nos sugieren 2 clusters para realizar el análisis. Como en `kmeans`, podemos utilizar la misma función para corroborarlo con 30 índices, utilizando el método `median`, que es el más indicado para medoides:
 
-```{r, cache=TRUE, eval=FALSE}
+```{r, cache=TRUE}
 resnumclust2 = NbClust(data = cX, distance = "euclidean", min.nc = 2, max.nc = 10, 
                       method = "median", index = "alllong")
 ```
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 fviz_nbclust(resnumclust2)
 ```
-Esta función nos sugiere escoger 2 clusters. De este modo, calculamos los clusters y los representamos.
 
+Esta función nos sugiere escoger 2 clusters. De este modo, calculamos los clusters y los representamos.
 
 ```{r}
 pam_clusters <- pam(x = cX, k = 2, metric = "manhattan")
@@ -433,30 +417,14 @@ hc_completo <- datos_quant %>% scale() %>% dist(method = "euclidean") %>%
  hclust(method = "complete")
 fviz_dend(x = hc_completo, k = 2, cex = 0.6) +
  geom_hline(yintercept = 11.2, linetype = "dashed")
-```
 
+fviz_dend(x = hc_completo, k = 4, cex = 0.6) +
+ geom_hline(yintercept = 9.2, linetype = "dashed")
+```
 
 Hay un cluster mucho más grande que el otro. Podríamos mirar si se corresponde con algun factor, y poder definir algunos perfiles.
 
-
-
-
-
-
-
-
-## Clara 
-
-
-
-
-
-
-
-
-
-
-
+## Clara
 
 ## Análisis de Componentes Principales
 
@@ -473,13 +441,11 @@ lambdas = get_eigenvalue(datos.acp)
 round(lambdas, 5)
 ```
 
-
-
 ```{r, echo=FALSE}
 fviz_eig(datos.acp, addlabels = TRUE, ylim=c(0,100))
 ```
 
-Efectivamente, viendo el gráfico y utilizando el criterio del codo, nos quedaremos con 
+Efectivamente, viendo el gráfico y utilizando el criterio del codo, nos quedaremos con
 
 Realicemos un gráfico de círculo de correlación variable para ver como se agrupan las variables y la calidad de representación que tienen.
 
@@ -488,8 +454,6 @@ fviz_pca_var(datos.acp, axes = c(1,2), col.var = "contrib",
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
              repel = TRUE)
 ```
-
-
 
 Para corroborar numéricamente la calidad de representación, realizaremos un gráfico de cos2.
 
@@ -506,20 +470,20 @@ Para ver como se relacionan las componentes principales con los datos originales
 round(datos.acp$rotation,4)
 ```
 
-Observemos que la primera componente principal da un peso muy elevado y positivo a la variable `Agrucultura`, y de signo contrario a las demás (excepto `Mineria` con un peso muy bajo).
+Observemos que la primera componente principal da un peso muy elevado y negativo a la variable `Bilirubin`.
 
-Respecto a la segunda componente principal, representa sobretodo a `Fábrica` y a `Servicios Sociales y Personales` (con signos opuestos pero un peso elevado).
+Respecto a la segunda componente principal, representa sobretodo a `Platelets`,  a `Age` y a `Cholesterol`.
 
 Ahora, vamos a realizar un `biplot`, que nos permitirá visualizar las variables originales y las observaciones transformadas en los ejes de componentes principales.
 
 ```{r, echo=FALSE}
 fviz_pca_biplot(datos.acp,  repel = TRUE,
                 col.var = "#2E9FDF", # color para las variables
-                col.ind = "#696969"  # color para las observaciones
+                col.ind = "#696969",  # color para las observaciones
+                geom = "point"
                 )
 ```
 
-De nuevo, se aprecia como la variable `Agricultura` es la mejor representada debido a la longitud de la flecha. Le siguen las variables de `Fábricas` y `Servicios Sociales y Personales`, mejor representadas por la segunda componente.
 
 ### Resultados del Análisis
 
@@ -570,8 +534,6 @@ Por último, la calidad de representación, es decir, el valor de cos2.
 head(round(res.obs$cos2,3), 5)
 ```
 
-
-
 ```{r, echo=FALSE, eval=FALSE}
 autoplot(datos.acp, data = datos, colour = 'Grupo',
          loadings = TRUE, loadings.colour = 'blue',
@@ -579,14 +541,3 @@ autoplot(datos.acp, data = datos, colour = 'Grupo',
   geom_text_repel(aes(label = rownames(datos)), box.padding = 0.5, segment.color = "darkgrey", size = 3, color = "darkgrey") +
   theme_bw()
 ```
-
-
-
-
-
-
-
-
-
-
-
