@@ -29,6 +29,71 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="slides_clustering_files/libs/revealjs/dist/theme/quarto.css">
   <link href="slides_clustering_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -325,8 +390,9 @@
   <link href="slides_clustering_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
   <style>
   #title-slide .title {
-    font-size: 4.5em;
+    font-size: 5em;
     color: #b22222;
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
   }
   </style>
 </head>
@@ -334,7 +400,7 @@
   <div class="reveal">
     <div class="slides">
 
-<section id="title-slide" class="quarto-title-block center">
+<section id="title-slide" data-background-image="higado.jpeg" data-background-opacity="1" data-background-size="contain" class="quarto-title-block center">
   <h1 class="title">Cirrosis</h1>
 
 <div class="quarto-title-authors">
@@ -356,7 +422,9 @@ Irene LiFeng Julià Pérez y Xisco Ribera Ramis
 </ul>
 <div>
 <p style="text-align:center;">
-</p><p><img src="Foto_cirrosis.jpg" width="600px"></p>
+</p><center>
+<p><img src="Foto_cirrosis.jpg" width="800px"></p>
+</center>
 <p></p>
 </div>
 </section>
@@ -366,14 +434,26 @@ Irene LiFeng Julià Pérez y Xisco Ribera Ramis
 <p>Establecer grupos de pacientes diferenciados y relacionarlos con algunos perfiles de pacientes de cirrosis.</p>
 <div>
 <p style="text-align:center;">
-</p><p><img src="Foto2.jpg" width="500px"></p>
+</p><center>
+<p><img src="Foto2.jpg" width="600px"></p>
+</center>
 <p></p>
 </div>
 </section>
 <section id="section-1" class="slide level2">
 <h2></h2>
-<p>Cargamos los datos y arreglamos las variables.</p>
-<p>Finalmente los datos son:</p>
+<p>Cargamos los datos y arreglamos las variables:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">"cirrosis_tidy.csv"</span>,  <span class="at">header =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1-2"><a href="#cb1-2"></a>datos <span class="ot">=</span> datos <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Ascites =</span> Ascites <span class="sc">%&gt;%</span> as.factor,</span>
+<span id="cb1-3"><a href="#cb1-3"></a>                         <span class="at">Hepatomegaly =</span> Hepatomegaly <span class="sc">%&gt;%</span> as.factor,</span>
+<span id="cb1-4"><a href="#cb1-4"></a>                         <span class="at">Spiders =</span> Spiders <span class="sc">%&gt;%</span> as.factor,</span>
+<span id="cb1-5"><a href="#cb1-5"></a>                         <span class="at">Edema =</span> Edema <span class="sc">%&gt;%</span> as.factor,</span>
+<span id="cb1-6"><a href="#cb1-6"></a>                         <span class="at">Stage =</span> Stage <span class="sc">%&gt;%</span> as.factor,</span>
+<span id="cb1-7"><a href="#cb1-7"></a>                         <span class="at">Drug =</span> Drug <span class="sc">%&gt;%</span> as.factor,</span>
+<span id="cb1-8"><a href="#cb1-8"></a>                         <span class="at">Sex =</span> Sex <span class="sc">%&gt;%</span> as.factor,</span>
+<span id="cb1-9"><a href="#cb1-9"></a>                         <span class="at">Status =</span> Status <span class="sc">%&gt;%</span> as.factor)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 276
@@ -544,12 +624,56 @@ $ Stage         &lt;fct&gt; 4, 3, 4, 4, 3, 3, 3, 2, 4, 4, 4, 3, 3, 3, 4, 4, 3, 4
 </div>
 </div>
 </section>
-<section id="section-4" class="slide level2">
-<h2></h2>
-<div class="footer footer-default">
-
+<section>
+<section id="clustering" class="title-slide slide level1 center">
+<h1>Clustering</h1>
+<p>Vamos a escoger los datos cuantitativos y los valos a escalar y centrar:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>datos2 <span class="ot">&lt;-</span> datos_quant <span class="sc">%&gt;%</span> <span class="fu">scale</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>n <span class="ot">&lt;-</span> <span class="fu">dim</span>(datos2)[<span class="dv">1</span>]</span>
+<span id="cb5-2"><a href="#cb5-2"></a>X <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(datos2)</span>
+<span id="cb5-3"><a href="#cb5-3"></a>Hn <span class="ot">&lt;-</span> <span class="fu">diag</span>(n)<span class="sc">-</span><span class="dv">1</span><span class="sc">/</span>n <span class="co"># matriz de centrado</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>cX <span class="ot">&lt;-</span> Hn<span class="sc">%*%</span>X <span class="co"># matriz centrada</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
+<section id="section-4" class="slide level2">
+<h2></h2>
+<p>Calculamos la matriz de distancias:</p>
+
+<img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"></section>
+<section id="k-means" class="slide level2">
+<h2>K-means</h2>
+<p>En nuestro caso, no sabemos en cuantos clusters o grupos esta dividido nuestro dataset. Por tanto, vamos a estimar al número <span class="math inline">\(k\)</span> óptimo para aplicar el método de <code>kmeans()</code>. Para ello, utilizaremos la función <code>fviz_nbclust()</code>:</p>
+
+<img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-10-1.png" width="960" class="r-stretch"></section>
+<section id="section-5" class="slide level2">
+<h2></h2>
+<p>Vamos a realizar otro experimento: vamos a realizar una función que nos proporciona 30 índices para determinar el número de clusters.</p>
+<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-13_fbf3803868b3632144ab1f8fb60c4a28">
+<div class="cell-output cell-output-stdout">
+<pre><code>* Among all indices: 
+===================
+* 2 proposed  0 as the best number of clusters
+* 1 proposed  1 as the best number of clusters
+* 8 proposed  2 as the best number of clusters
+* 1 proposed  3 as the best number of clusters
+* 10 proposed  4 as the best number of clusters
+* 1 proposed  7 as the best number of clusters
+* 1 proposed  8 as the best number of clusters
+* 3 proposed  9 as the best number of clusters
+* 3 proposed  10 as the best number of clusters
+
+     *****Conclusion*****
+* According to the majority rule, the best number of clusters is  4 .</code></pre>
+</div>
+
+</div>
+<img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-13-1.png" width="960" class="r-stretch"><div class="footer footer-default">
+
+</div>
+</section></section>
     </div>
   </div>
 
@@ -707,7 +831,7 @@ $ Stage         &lt;fct&gt; 4, 3, 4, 4, 3, 3, 3, 2, 4, 4, 4, 3, 3, 3, 4, 4, 3, 4
         previewLinks: false,
 
         // Transition style (none/fade/slide/convex/concave/zoom)
-        transition: 'none',
+        transition: 'slide',
 
         // Transition speed (default/fast/slow)
         transitionSpeed: 'default',
