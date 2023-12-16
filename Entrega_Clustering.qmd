@@ -23,6 +23,8 @@ library(ggplot2)
 library(factoextra)
 library(stats)
 library(cluster)
+library(NbClust)
+library(ggrepel)
 ```
 
 # Recordatorio
@@ -51,14 +53,14 @@ glimpse(datos)
 El tibble resultante consta de 276 observaciones y 20 variables. Cada muestra representa un paciente al que se le ha extraido la siguiente información:
 
 -   `ID`: Identificador único
--   `N_Days`: Número de días entre el registro y la fecha de defunción, transplante o estudio analítico enJulio de 1986.
+-   `N_Days`: Número de días entre el registro y la fecha de defunción, transplante o estudio analítico en Julio de 1986.
 -   `Status`: Estatus del paciente: C (Censurado), CL (censurado debido a tratamiento hepático), o D (Muerto)
 -   `Drug`: Tipo de fármaco: D-penicilamina o placebo
 -   `Age`: Edad \[días\]
 -   `Sex`: Sexo cromosómico: Male (hombre) o Female (Mujer)
--   `Ascites`: Presencia de Ascitis No o Si
--   `Hepatomegaly`: Presencia de Hepatomegalia No o Si
--   `Spiders`: Presencia de arañas vasculares No o Si
+-   `Ascites`: Presencia de Ascitis: No o Si
+-   `Hepatomegaly`: Presencia de Hepatomegalia: No o Si
+-   `Spiders`: Presencia de arañas vasculares: No o Si
 -   `Edema`: Presencia de Edema: No (no hay edema y sin tratamiento diurético para el edema), Sin (presencia de edema sin diuréticos, o edema curado con diuréticos), o Si (edema a pesar del tratamiento con diuréticos)
 -   `Bilirubin`: Bilirrubina sérica \[mg/dl\]
 -   `Cholesterol`: Colesterol sérico \[mg/dl\]
@@ -147,15 +149,19 @@ mvnormtest::mshapiro.test(t(datos_quant))
 
 Obtenemos un p-valor muy pequeño, prácticamente 0, entonces, rechazamos la hipótesis nula y concluimos que no hay normalidad multivariante, es decir, almenos una variable individual no se distribuye normalmente.
 
+
+
+
+
 # Clustering
 
-En primer lugar vamos a tipificar o escalar nuestros datos para que esten todos a la misma escala:
+Vamos a guardar en un nuevo dataset las variables cuantitativas. Vamos a tipificar o escalar nuestros datos para que esten todos a la misma escala:
 
 ```{r}
 datos2 <- datos_quant %>% scale()
 ```
 
-A continuación realicemos una representación gráfica de matrices de distancia:
+A continuación, realicemos una representación gráfica de matrices de distancia:
 
 Primero de todo vamos a centrar la matriz de datos:
 
@@ -177,31 +183,180 @@ fviz_dist(dist.obj = mat_dist, lab_size = 5) +
 
 ## K-means
 
-En nuestro caso, no sabemos cuantos clusters o grupos esta dividido nuestro dataset. Por tanto vamos a estimar al número $k$ óptimo para aplicar el `kmeans()`. Para ello utilizaremos la función `fviz_nbclust()`:
+En nuestro caso, no sabemos en cuantos clusters o grupos esta dividido nuestro dataset. Por tanto, vamos a estimar al número $k$ óptimo para aplicar el método de `kmeans()`. Para ello, utilizaremos la función `fviz_nbclust()`:
 
 ```{r}
 fviz_nbclust(x = cX, FUNcluster = kmeans, method = "wss",
- diss = dist(cX, method = "euclidean")) +
- geom_vline(xintercept = 3, linetype = 2)
+ diss = dist(cX, method = "euclidean")) 
+#+
+ #geom_vline(xintercept = 3, linetype = 2)
 
+```
+Realmente, con el método del codo, es un poco complicado establemcer un $k$ óptimo, así que vamos a utilizar otros métodos que nos proporciona `R`:
+
+
+```{r}
+fviz_nbclust(x = cX, FUNcluster = kmeans, method = "silhouette")
 ```
 
 
 ```{r}
-#set.seed(2312)
-km_clusters <- kmeans(x = cX, centers = 3, nstart = 78)
+fviz_nbclust(x = cX, FUNcluster = kmeans, method = "gap_stat")
+```
 
+
+Con el método de la silueta, nos sugiere escoger $k=2$, en cambio, con el siguiente, nos sugiere 8 clusters. Como no hemos salido de dudas, vamos a realizar otro experimento: vamos a realizar una función que nos proporciona 30 índices para determinar el número de clusters.
+
+```{r, cache=TRUE}
+resnumclust = NbClust(data = cX, distance = "euclidean", min.nc = 2, max.nc = 10, 
+                      method = "kmeans", index = "alllong")
+```
+
+
+```{r, echo=FALSE}
+# fix the functions
+fviz_nbclust <- function (x, FUNcluster = NULL, method = c("silhouette", "wss", 
+                                           "gap_stat"), diss = NULL, k.max = 10, nboot = 100, verbose = interactive(), 
+          barfill = "steelblue", barcolor = "steelblue", linecolor = "steelblue", 
+          print.summary = TRUE, ...) 
+{
+  set.seed(123)
+  if (k.max < 2) 
+    stop("k.max must bet > = 2")
+  method = match.arg(method)
+  if (!inherits(x, c("data.frame", "matrix")) & !("Best.nc" %in% 
+                                                  names(x))) 
+    stop("x should be an object of class matrix/data.frame or ", 
+         "an object created by the function NbClust() [NbClust package].")
+  if (inherits(x, "list") & "Best.nc" %in% names(x)) {
+    best_nc <- x$Best.nc
+    if (any(class(best_nc) == "numeric") ) 
+      print(best_nc)
+    else if (any(class(best_nc) == "matrix") )
+      .viz_NbClust(x, print.summary, barfill, barcolor)
+  }
+  else if (is.null(FUNcluster)) 
+    stop("The argument FUNcluster is required. ", "Possible values are kmeans, pam, hcut, clara, ...")
+  else if (!is.function(FUNcluster)) {
+    stop("The argument FUNcluster should be a function. ", 
+         "Check if you're not overriding the specified function name somewhere.")
+  }
+  else if (method %in% c("silhouette", "wss")) {
+    if (is.data.frame(x)) 
+      x <- as.matrix(x)
+    if (is.null(diss)) 
+      diss <- stats::dist(x)
+    v <- rep(0, k.max)
+    if (method == "silhouette") {
+      for (i in 2:k.max) {
+        clust <- FUNcluster(x, i, ...)
+        v[i] <- .get_ave_sil_width(diss, clust$cluster)
+      }
+    }
+    else if (method == "wss") {
+      for (i in 1:k.max) {
+        clust <- FUNcluster(x, i, ...)
+        v[i] <- .get_withinSS(diss, clust$cluster)
+      }
+    }
+    df <- data.frame(clusters = as.factor(1:k.max), y = v, 
+                     stringsAsFactors = TRUE)
+    ylab <- "Total Within Sum of Square"
+    if (method == "silhouette") 
+      ylab <- "Average silhouette width"
+    p <- ggpubr::ggline(df, x = "clusters", y = "y", group = 1, 
+                        color = linecolor, ylab = ylab, xlab = "Number of clusters k", 
+                        main = "Optimal number of clusters")
+    if (method == "silhouette") 
+      p <- p + geom_vline(xintercept = which.max(v), linetype = 2, 
+                          color = linecolor)
+    return(p)
+  }
+  else if (method == "gap_stat") {
+    extra_args <- list(...)
+    gap_stat <- cluster::clusGap(x, FUNcluster, K.max = k.max, 
+                                 B = nboot, verbose = verbose, ...)
+    if (!is.null(extra_args$maxSE)) 
+      maxSE <- extra_args$maxSE
+    else maxSE <- list(method = "firstSEmax", SE.factor = 1)
+    p <- fviz_gap_stat(gap_stat, linecolor = linecolor, 
+                       maxSE = maxSE)
+    return(p)
+  }
+}
+
+.viz_NbClust <- function (x, print.summary = TRUE, barfill = "steelblue", 
+          barcolor = "steelblue") 
+{
+  best_nc <- x$Best.nc
+  if (any(class(best_nc) == "numeric") )
+    print(best_nc)
+  else if (any(class(best_nc) == "matrix") ) {
+    best_nc <- as.data.frame(t(best_nc), stringsAsFactors = TRUE)
+    best_nc$Number_clusters <- as.factor(best_nc$Number_clusters)
+    if (print.summary) {
+      ss <- summary(best_nc$Number_clusters)
+      cat("Among all indices: \n===================\n")
+      for (i in 1:length(ss)) {
+        cat("*", ss[i], "proposed ", names(ss)[i], 
+            "as the best number of clusters\n")
+      }
+      cat("\nConclusion\n=========================\n")
+      cat("* According to the majority rule, the best number of clusters is ", 
+          names(which.max(ss)), ".\n\n")
+    }
+    df <- data.frame(Number_clusters = names(ss), freq = ss, 
+                     stringsAsFactors = TRUE)
+    p <- ggpubr::ggbarplot(df, x = "Number_clusters", 
+                           y = "freq", fill = barfill, color = barcolor) + 
+      labs(x = "Number of clusters k", y = "Frequency among all indices", 
+           title = paste0("Optimal number of clusters - k = ", 
+                          names(which.max(ss))))
+    return(p)
+  }
+}
+# assign them to the factoextra namespace
+environment(fviz_nbclust) <- asNamespace("factoextra")
+assignInNamespace("fviz_nbclust",fviz_nbclust,"factoextra")
+environment(.viz_NbClust) <- asNamespace("factoextra")
+assignInNamespace(".viz_NbClust",.viz_NbClust,"factoextra")
+```
+
+
+
+
+```{r, cache=TRUE}
+fviz_nbclust(resnumclust)
+```
+
+
+Vamos a calcular los 4 clusters con nuestros datos y con 30 iteraciones. Además, vamos a visualizar como ha quedado la partición.
+
+```{r}
+#set.seed(2312)
+km_clusters <- kmeans(x = cX, centers = 4, nstart = 30)
+km_clusters$cluster
+```
+
+Ahora bien, representemos dichos clusters en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2)
+
+```{r}
 fviz_cluster(object = km_clusters, data = cX, show.clust.cent = TRUE, geom ="point",
  ellipse.type = "euclid", star.plot = TRUE, repel = TRUE) +
 theme_bw() +
 theme(legend.position = "none")
 ```
+Como podemos var, al menos en la proyección en 2 dimensiones, hay bastante solapamiento. Además, si vemos la zona pintada como si fuera un intervalo de confianza, hay muchas observaciones que quedan fuera.
 
-Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2)
 
-```{r}
-km_clusters
+
+```{r, cache =TRUE}
+res = hcut(cX, k=4, stand = TRUE)
+fviz_dend(res, rect = TRUE, cex = 0.5, k_colors = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8"))
 ```
+
+
+
 
 ## K-medoids (PAM)
 
@@ -214,7 +369,7 @@ fviz_nbclust(x = cX, FUNcluster = pam, method = "wss",
 ```
 
 ```{r}
-pam_clusters <- pam(x = cX, k = 3, metric = "euclidean")
+pam_clusters <- pam(x = cX, k = 6, metric = "euclidean")
 
 fviz_cluster(object = pam_clusters, data = cX, ellipse.type = "t", geom = "point",  repel = TRUE) +
   theme_bw() + 
@@ -248,13 +403,13 @@ lambdas = get_eigenvalue(datos.acp)
 round(lambdas, 5)
 ```
 
-Notemos que usando las 2 primeras componentes principales explican aproximadamente el 93.3% de los datos. Veamos el gráfico del codo:
+
 
 ```{r, echo=FALSE}
 fviz_eig(datos.acp, addlabels = TRUE, ylim=c(0,100))
 ```
 
-Efectivamente, viendo el gráfico y utilizando el criterio del codo, nos quedaremos con las dos primeras componentes principales.
+Efectivamente, viendo el gráfico y utilizando el criterio del codo, nos quedaremos con 
 
 Realicemos un gráfico de círculo de correlación variable para ver como se agrupan las variables y la calidad de representación que tienen.
 
@@ -342,65 +497,15 @@ Por último, la calidad de representación, es decir, el valor de cos2.
 round(res.obs$cos2,3)  # Calidad de la representación
 ```
 
-### Grupos
 
-Vamos a tratar de determinar grupos de países con comportamientos semejantes en la distribución de su fuerza de trabajo.
 
-El criterio que seguiremos es separar las observaciones dependiendo de su contribucón a las componentes principales. Como la variable `Agricultura` es la que tiene una mayor representación, uno de los grupos estará formado por los paises cuya mayor fuerza de trabajo se basa en la agricultura. Para determinar este grupo, consideraremos los paises que tienen coordenada positiva en el eje de la primera componente principal.
-
-Las otras dos variables mejor representadas son `Fábricas` y `Servicios Sociales y Personales`. La relación de estas variables con la primera componente principal es negativa, así que consideramos el resto de paises para clasificar en estos dos grupos. Esta clasificación se va a determinar mediante la segunda componente principal: la relación de `Fábricas` con la componente principal es positiva, mientras que con la otra variable es negativa. Por tanto, utilizaremos estas condiciones para dividir los paises.
-
-```{r, echo=FALSE}
-coord = data.frame(res.obs$coord[, c(1,2)])
-coord = coord %>% 
-  mutate(Grupos = if_else(Dim.1 > 0, "Grupo 1", if_else(Dim.2 > 0, "Grupo 2", "Grupo 3")))
-coord
-```
-
-Añadimos este factor a nuestra tabla de datos original y realizamos un gráfico para visualizar la división de los grupos.
-
-```{r, echo=FALSE}
-datos = datos %>% 
-  mutate(Grupo = as.factor(coord$Grupos))
-glimpse(datos)
-```
-
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=FALSE}
 autoplot(datos.acp, data = datos, colour = 'Grupo',
          loadings = TRUE, loadings.colour = 'blue',
          loadings.label = FALSE, loadings.label.size = 3, size = 3) +
   geom_text_repel(aes(label = rownames(datos)), box.padding = 0.5, segment.color = "darkgrey", size = 3, color = "darkgrey") +
   theme_bw()
 ```
-
-Veamos en un mapa de Europa con los paises pintados en función del grupo al cual le hemos asignado:
-
-![](Europa%20Map%20Chart.png)
-
-Nota: Como los datos se tomaron en 1979, el mapa de Europa ha cambiado respecto al actual. Algunos paises se han fragmentado y otros se han unido. En concreto:
-
--   Debido a la separación de Alemania por muro de Berlín después de la Seguna Guerra Mundial se diferenció entre Alemania Oriental y Alemania Occidental (hasta 1989, que se volvió a unir en un solo estado). Por tanto, en el mapa solo hemos considerado Alemania.
-
--   Hay una muestra llamada "Checoslovaquia", que actualmente este estado esta separado en Republica Checa y Eslovaquia (separación en 1992).
-
--   Del mismo modo aparece la Unión Sovietica, cuyos paises que la conformaban son: Rusia, Transcaucásicas (Armenia, Azerbayán y Georgia), Ucrania y Bielorrusia (disolución en 1991).
-
--   Por último tenemos Yugoslavia: Bosnia y Herzegovina, Croacia, Eslovenia, Macedonia, Montenegro y Serbia (disolución en 1992).
-
-A la hora de pintar el mapa, todos los paises actuales que formaban parte de algun estado mencionado anteriormente se han coloreado del mismo color que el estado al que pertenecían. Por tanto, las conclusiones que se extraen no son actuales ya que cada país ahora es independiente.
-
-### Conclusión
-
--   Usando el método de componentes principales hemos podido reducir el número de variables a 2, ya que explican aproximadamente el 93.3% de los datos.
-
--   Las variables iniciales que mejor se han podido describir con las dos componentes principales han sido `Agricultura`, `Fábrica` y `Servicios Sociales y Personales`.
-
--   Hemos podido establecer 3 grupos de paises con comportamientos semejantes en función de si su fuerza de trabajo se distribuía más en `Agricultura` (Grupo 1), `Fábrica` (Grupo 2) y `Servicios Sociales y Personales` (Grupo 3).
-
-
-
-
-
 
 
 
