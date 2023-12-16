@@ -33,6 +33,8 @@ Vamos a tratar una base de datos relacionados con la predicción de riesgo de ci
 
 Nuestro objetivo para este estudio sería estudiar algunos perfiles con riesgo de padecer cirrosis.
 
+Los datos provienen de la página web Kaggle: [Kaggle - Cirrhosis](https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset/).
+
 Recordemos nuestra tabla de datos:
 
 ```{r}
@@ -365,8 +367,6 @@ Cluster = km_clusters$cluster %>% as.factor()
 
 tabla_cluster = cbind(id_stage, Cluster)
 tabla_cluster
-
-round(100*prop.table(table(x = tabla_cluster[,c(2,3)])), 3)
 
 table(x = tabla_cluster[,c(2,3)])
 ```

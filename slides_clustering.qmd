@@ -1,8 +1,150 @@
 ---
-title: "Slides_clustering"
-author: "Xisco Ribera& Irene Julià"
-format: revealjs
+title: "Cirrosis"
+format: 
+  revealjs:
+    smaller: true
+    scrollable: TRUE
 editor: visual
+author: Irene LiFeng Julià Pérez y Xisco Ribera Ramis
+include-in-header:
+  - text: |
+      <style>
+      #title-slide .title {
+        font-size: 4.5em;
+        color: #b22222;
+      }
+      </style>
 ---
 
-prueba diapos
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+library(tidyverse)
+library(dplyr)
+library(GGally)
+library(psych)
+library(skimr)
+library(fmsb)
+library(mvnormtest)
+library(car)
+library(nortest)
+library(fBasics)
+library(ggplot2)
+library(factoextra)
+library(stats)
+library(cluster)
+library(NbClust)
+library(ggrepel)
+library(tidyverse)
+library(dplyr)
+library(knitr)
+library(kableExtra)
+```
+
+
+### Presentación del problema
+
+-   Base de datos relacionados con la cirrosis.
+
+-   Fuente: [Kaggle - Cirrhosis](https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset/)
+
+-   Repositorio: [enlace](https://github.com/XiscoRibera/Entrega6_AD.git)
+
+<div>
+
+<p style="text-align:center;">
+
+<img src="Foto_cirrosis.jpg" width="600px"/>
+
+</p>
+
+</div>
+
+## 
+
+### Objetivo del estudio
+
+Establecer grupos de pacientes diferenciados y relacionarlos con algunos perfiles de pacientes de cirrosis.
+
+<div>
+
+<p style="text-align:center;">
+
+<img src="Foto2.jpg" width="500px"/>
+
+</p>
+
+</div>
+
+## 
+
+Cargamos los datos y arreglamos las variables.
+
+```{r}
+datos <- read.table("cirrosis_tidy.csv",  header = TRUE )
+datos = datos %>% mutate(Ascites = Ascites %>% as.factor,
+                         Hepatomegaly = Hepatomegaly %>% as.factor,
+                         Spiders = Spiders %>% as.factor,
+                         Edema = Edema %>% as.factor,
+                         Stage = Stage %>% as.factor,
+                         Drug = Drug %>% as.factor,
+                         Sex = Sex %>% as.factor,
+                         Status = Status %>% as.factor)
+```
+
+
+
+Finalmente los datos son:
+
+```{r}
+glimpse(datos)
+```
+
+## 
+
+### Variables
+
+#### Variables cuantitativas
+
+```{r, echo=FALSE}
+```{r, echo=FALSE}
+# Separamos los datos en variables cuantitativas y cualitativas
+datos_quant <- datos %>% 
+  select(where(is.numeric)) %>% 
+  select(-1)
+
+
+datos_qual <- datos %>% 
+  select(where(is.factor))
+
+
+# Cuantitativas
+
+Unidad = c("Días", "Días", "mg/dl", "mg/dl", "g/dl", "ug/día", "U/l", "U/ml", "mg/dl", "ml/1000", "s")
+
+Media = round(colMeans(datos_quant),3)
+
+rango <- function(x){
+  return(max(x)-min(x))
+}
+Rango = round(apply(datos_quant, FUN = rango, MARGIN = 2), 3)
+Minimo = round(apply(datos_quant, FUN = min, 2),3)
+Maximo = round(apply(datos_quant, FUN = max, 2),3)
+Desv = round(apply(datos_quant, FUN = sd, 2), 3)
+
+tabla = data.frame(Unidad, Media, Desv, Minimo, Maximo, Rango)
+
+kable(tabla, format = "html", escape = FALSE) %>%
+  kable_styling("striped", full_width = TRUE) %>%
+  kable_styling(font_size = 25)  # Ajusta el tamaño de la fuente
+```
+
+## 
+
+#### Variables cualitativas
+
+```{r, echo=FALSE}
+summary(datos_qual)
+```
+
+## 
+
