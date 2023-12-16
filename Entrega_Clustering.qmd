@@ -187,10 +187,7 @@ En nuestro caso, no sabemos en cuantos clusters o grupos esta dividido nuestro d
 
 ```{r}
 fviz_nbclust(x = cX, FUNcluster = kmeans, method = "wss",
- diss = dist(cX, method = "euclidean")) 
-#+
- #geom_vline(xintercept = 3, linetype = 2)
-
+ diss = dist(cX, method = "euclidean"))
 ```
 Realmente, con el método del codo, es un poco complicado establemcer un $k$ óptimo, así que vamos a utilizar otros métodos que nos proporciona `R`:
 
@@ -207,7 +204,7 @@ fviz_nbclust(x = cX, FUNcluster = kmeans, method = "gap_stat")
 
 Con el método de la silueta, nos sugiere escoger $k=2$, en cambio, con el siguiente, nos sugiere 8 clusters. Como no hemos salido de dudas, vamos a realizar otro experimento: vamos a realizar una función que nos proporciona 30 índices para determinar el número de clusters.
 
-```{r, cache=TRUE}
+```{r, cache=TRUE,eval=FALSE}
 resnumclust = NbClust(data = cX, distance = "euclidean", min.nc = 2, max.nc = 10, 
                       method = "kmeans", index = "alllong")
 ```
@@ -296,12 +293,12 @@ fviz_nbclust <- function (x, FUNcluster = NULL, method = c("silhouette", "wss",
     best_nc$Number_clusters <- as.factor(best_nc$Number_clusters)
     if (print.summary) {
       ss <- summary(best_nc$Number_clusters)
-      cat("Among all indices: \n===================\n")
+      cat("* Among all indices: \n===================\n")
       for (i in 1:length(ss)) {
         cat("*", ss[i], "proposed ", names(ss)[i], 
             "as the best number of clusters\n")
       }
-      cat("\nConclusion\n=========================\n")
+      cat("\n \t *****Conclusion*****\n")
       cat("* According to the majority rule, the best number of clusters is ", 
           names(which.max(ss)), ".\n\n")
     }
@@ -354,6 +351,27 @@ Como podemos var, al menos en la proyección en 2 dimensiones, hay bastante sola
 res = hcut(cX, k=4, stand = TRUE)
 fviz_dend(res, rect = TRUE, cex = 0.5, k_colors = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8"))
 ```
+
+
+
+Ahora bien, sería interesante ver si estos clusters corresponden a las fases de cirrosis segun la variable `stage`.
+
+Vamos a crear un data frame compuesto de 3 columnas: identificador del paciente, estado de la enfermedad y cluster al que pertenece.
+
+```{r}
+id_stage = datos %>% 
+  select(ID, Stage)
+Cluster = km_clusters$cluster %>% as.factor()
+
+tabla_cluster = cbind(id_stage, Cluster)
+tabla_cluster
+
+round(100*prop.table(table(x = tabla_cluster[,c(2,3)])), 3)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+FATAL
+
 
 
 
@@ -482,19 +500,22 @@ Ahora, respecto a las observaciones, empezamos por las coordenadas.
 
 ```{r, echo=FALSE}
 res.obs=get_pca_ind(datos.acp)
-round(res.obs$coord, 2)  #Coordenadas
+#round(res.obs$coord, 2)  #Coordenadas
+head(round(res.obs$coord, 2), 5)  #Coordenadas
 ```
 
 También las contribuciones de cada observación a las componentes principales.
 
 ```{r, echo=FALSE}
-round(res.obs$contrib,2)  #Contribuciones a las CP
+#round(res.obs$contrib,2)  #Contribuciones a las CP
+head(round(res.obs$contrib,2), 5)  #Contribuciones a las CP
 ```
 
 Por último, la calidad de representación, es decir, el valor de cos2.
 
 ```{r, echo=FALSE}
-round(res.obs$cos2,3)  # Calidad de la representación
+#round(res.obs$cos2,3)  # Calidad de la representación
+head(round(res.obs$cos2,3), 5)
 ```
 
 
