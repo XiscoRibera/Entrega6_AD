@@ -323,7 +323,7 @@ Vamos a calcular las 4 k-medias con nuestros datos y con 30 iteraciones. Además
 ```{r}
 #set.seed(2312)
 km_clusters <- kmeans(x = cX, centers = 4, nstart = 30)
-km_clusters$cluster
+# km_clusters$cluster
 ```
 
 Ahora bien, representemos dichos clusters en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2).
@@ -391,28 +391,21 @@ Esta función nos sugiere escoger 2 clusters. De este modo, calculamos los clust
 ```{r}
 pam_clusters <- pam(x = cX, k = 2, metric = "manhattan")
 
-fviz_cluster(object = pam_clusters, data = cX, ellipse.type = "t", geom = "point", 
-             repel =TRUE) +
+fviz_cluster(object = pam_clusters, data = cX, ellipse.type = "t", geom = "point", repel =TRUE) +
   theme_bw() + 
   theme(legend.position = "none")
 ```
 
 Estan bastante solapados, puede deberse a la proyección a dos dimensiones.
 
-```{r, cache =TRUE, eval=FALSE, echo=FALSE}
+Realicemos kmedoids con k=4 para comparar:
 
-### Dendograma
+```{r}
+pam_clusters_ <- pam(x = cX, k = 4, metric = "manhattan")
 
-#Visualicemos un dendograma que nos ayude a observar la clasificación:
-
-
-hc_completo <- datos_quant %>% scale() %>% dist(method = "euclidean") %>%
- hclust(method = "complete")
-fviz_dend(x = hc_completo, k = 2, cex = 0.6) +
- geom_hline(yintercept = 11.2, linetype = "dashed")
-
-fviz_dend(x = hc_completo, k = 4, cex = 0.6) +
- geom_hline(yintercept = 9.2, linetype = "dashed")
+fviz_cluster(object = pam_clusters_, data = cX, ellipse.type = "t", geom = "point", repel =TRUE) +
+  theme_bw() + 
+  theme(legend.position = "none")
 ```
 
 
@@ -434,9 +427,8 @@ Como sabemos, existen diferentes tipos de dendogramas en función del tipo de di
 
 - **Centroid:** Se calcula el centroide de cada uno de los clusters y se selecciona la distancia entre ellos como la distancia entre los dos clusters.
 
-- **Ward:** Se trata de un método general. La selección del par de clusters que se combinan en cada paso del agglomerative hierarchical clustering se basa en el valor óptimo de una función objetivo, pudiendo ser esta última cualquier función definida por el analista. Un caso particular es *Ward's minimum variance*, en cada paso se identifican aquellos 2 clusters cuya fusión conlleva menor incremento de la varianza total intra-cluster.
+- **Ward:** Se trata de un método general. La selección del par de clusters que se combinan en cada paso del *agglomerative hierarchical clustering* se basa en el valor óptimo de una función objetivo, pudiendo ser esta última cualquier función definida por el analista. Un caso particular es *Ward's minimum variance*, en cada paso se identifican aquellos 2 clusters cuya fusión conlleva menor incremento de la varianza total intra-cluster.
 
-Realicemos unos cuantos dendogramas:
 
 - Dendograma para 4 clusters con distancia entre clusters *Complete or Maximum*:
 
@@ -476,12 +468,13 @@ fviz_dend(x = hc_average, k = 4, cex = 0.6) +
 
 ```{r, cache=TRUE}
 hc_ward_D2 <- mat_dist %>%
-  hclust(method = "ward.D2") # Average
+  hclust(method = "ward.D2") # Ward's minimum variance
 
 fviz_dend(x = hc_ward_D2, k = 4, cex = 0.6) +
  geom_hline(yintercept = 25, linetype = "dashed")+
   geom_hline(yintercept = 18, linetype = "dashed")
 ```
+
 - Observemos que al tener muchas observaciones no podemos distinguirlas. Aun así nos podemos hacer una idea del tamaño de cada cluster. 
 
 - Observamos que en nuestros datos los clusters que se forman dependen mucho de la distancia entre clusters que se escoja. Esto puede indicar que los datos no esten distribuidos en grupos bien diferenciados.
@@ -489,12 +482,17 @@ fviz_dend(x = hc_ward_D2, k = 4, cex = 0.6) +
 - Observamos que si cortamos más arriba el dendograma (la línea más alta), podemos ver cuales son los clusters que se juntan si quisiéramos solo 2 clusters.
 
 
-```{r, cache = TRUE, echo=FALSE}
-#res = hcut(cX, k=4, stand = TRUE)
-#fviz_dend(res, rect = TRUE, cex = 0.5, k_colors = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8"))
+Una vez calculados los dendogramas, hay que comprobar que la estructura preserva bien las distancias originales entre las observaciones. Para hacerlo usemos el coeficiente de correlación entre las distancias *cophenetic* del dendrograma y la matriz de distancias original. Cuanto más cercano a 1 sea el valor, mejor refleja el dendograma las distancias originales.
+
+
+```{r}
+cor(x = mat_dist, cophenetic(hc_completo))
+cor(x = mat_dist, cophenetic(hc_single))
+cor(x = mat_dist, cophenetic(hc_average))
+cor(x = mat_dist, cophenetic(hc_ward_D2))
 ```
 
-
+- Observamos que las distancias *Single or Minimum* y *Average* preservan mejor las distancias entre observaciones, en cambio *Ward's minimum variance* en nustro caso no es recomendable usarla.
 
 
 # Análisis de Componentes Principales
