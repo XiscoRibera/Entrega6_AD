@@ -300,7 +300,7 @@ fviz_nbclust <- function (x, FUNcluster = NULL, method = c("silhouette", "wss",
         cat("*", ss[i], "proposed ", names(ss)[i], 
             "as the best number of clusters\n")
       }
-      cat("\n \t *****Conclusion*****\n")
+      cat("\n \t *****Conclusion*****\n\n")
       cat("* According to the majority rule, the best number of clusters is ", 
           names(which.max(ss)), ".\n\n")
     }
@@ -345,8 +345,11 @@ fviz_cluster(object = km_clusters, data = cX, show.clust.cent = TRUE, geom ="poi
 theme_bw() +
 theme(legend.position = "none")
 ```
-Como podemos var, al menos en la proyección en 2 dimensiones, hay bastante solapamiento. Además, si vemos la zona pintada como si fuera un intervalo de confianza, hay muchas observaciones que quedan fuera.
+Como podemos ver, al menos en la proyección en 2 dimensiones, hay bastante solapamiento. Además, si vemos la zona pintada como si fuera un intervalo de confianza, hay muchas observaciones que quedan fuera.
 
+### Dendograma
+
+Visualicemos un dendograma para ver estas particiones en los datos.
 
 ```{r, cache =TRUE}
 res = hcut(cX, k=4, stand = TRUE)
@@ -377,31 +380,81 @@ FATAL
 
 ## K-medoids (PAM)
 
-En este caso, cada cluster está representado por una observación presente en el cluster (medoid), mientras que en K-means cada cluster está representado por su centroide, que se corresponde con el promedio de todas las observaciones del cluster pero con ninguna en particular.
+En este caso, cada cluster está representado por una observación presente en el cluster (medoid), mientras que en K-means cada cluster está representado por su centroide, que se corresponde con el promedio de todas las observaciones del cluster pero con ninguna en particular. Vamos a utilizar la distancia de Manhattaan ya que es menos sensible a outliers.
 
 ```{r, warning=FALSE}
 fviz_nbclust(x = cX, FUNcluster = pam, method = "wss",
- diss = dist(datos, method = "euclidean")) +
-  geom_vline(xintercept = 6, linetype = 2)
+ diss = dist(datos, method = "manhattan"))
+```
+Encontramos codos en $k=2$, $k=4$ y uno muy pronunciado en $k=6$. Para ver cual sería óptimo, como en el caso anterior, visualicemos otros métodos como el de la silueta i gap_stat.
+
+```{r, warning=FALSE}
+fviz_nbclust(x = cX, FUNcluster = pam, method = "silhouette",
+ diss = dist(datos, method = "manhattan"))
 ```
 
-```{r}
-pam_clusters <- pam(x = cX, k = 6, metric = "euclidean")
 
-fviz_cluster(object = pam_clusters, data = cX, ellipse.type = "t", geom = "point",  repel = TRUE) +
+```{r, warning=FALSE}
+fviz_nbclust(x = cX, FUNcluster = pam, method = "gap_stat",
+ diss = dist(datos, method = "manhattan"))
+```
+
+
+Estos dos métodos nos sugieren 2 clusters para realizar el análisis. Como en `kmeans`, podemos utilizar la misma función para corroborarlo con 30 índices, utilizando el método `median`, que es el más indicado para medoides:
+
+```{r, cache=TRUE, eval=FALSE}
+resnumclust2 = NbClust(data = cX, distance = "euclidean", min.nc = 2, max.nc = 10, 
+                      method = "median", index = "alllong")
+```
+
+```{r, cache=TRUE}
+fviz_nbclust(resnumclust2)
+```
+Esta función nos sugiere escoger 2 clusters. De este modo, calculamos los clusters y los representamos.
+
+
+```{r}
+pam_clusters <- pam(x = cX, k = 2, metric = "manhattan")
+
+fviz_cluster(object = pam_clusters, data = cX, ellipse.type = "t", geom = "point", 
+             repel =TRUE) +
   theme_bw() + 
   theme(legend.position = "none")
 ```
 
-## Dendograma
+Estan bastante solapados, puede deberse a la proyección a dos dimensiones.
+
+### Dendograma
+
+Visualicemos un dendograma que nos ayude a observar la clasificación:
 
 ```{r, cache =TRUE}
-set.seed(101)
 hc_completo <- datos_quant %>% scale() %>% dist(method = "euclidean") %>%
  hclust(method = "complete")
-fviz_dend(x = hc_completo, k = 3, cex = 0.6) +
- geom_hline(yintercept = 10.5, linetype = "dashed")
+fviz_dend(x = hc_completo, k = 2, cex = 0.6) +
+ geom_hline(yintercept = 11.2, linetype = "dashed")
 ```
+
+
+Hay un cluster mucho más grande que el otro. Podríamos mirar si se corresponde con algun factor, y poder definir algunos perfiles.
+
+
+
+
+
+
+
+
+## Clara 
+
+
+
+
+
+
+
+
+
 
 
 
