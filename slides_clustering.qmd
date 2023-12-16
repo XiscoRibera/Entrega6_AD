@@ -161,11 +161,16 @@ summary(datos_qual)
 
 # Clustering
 
-Vamos a escoger los datos cuantitativos y los valos a escalar y centrar:
+
+
+Vamos a escoger los datos cuantitativos y los valos a escalar.
 
 ```{r, echo=TRUE}
 datos2 <- datos_quant %>% scale()
 ```
+
+
+A continuación, los centramos.
 
 ```{r, echo=TRUE}
 n <- dim(datos2)[1]
@@ -177,7 +182,8 @@ cX <- Hn%*%X # matriz centrada
 
 ##
 
-Calculamos la matriz de distancias:
+### Matriz de distancias
+
 
 ```{r}
 mat_dist <- dist(x = cX, method = "euclidean")
@@ -187,7 +193,6 @@ mat_dist <- dist(x = cX, method = "euclidean")
 fviz_dist(dist.obj = mat_dist, lab_size = 5) +
  theme(legend.position = "none")
 ```
-
 
 
 
@@ -324,6 +329,57 @@ assignInNamespace(".viz_NbClust",.viz_NbClust,"factoextra")
 ```{r, cache=TRUE}
 fviz_nbclust(resnumclust)
 ```
+
+
+##
+
+Vamos a calcular las 4 k-medias con nuestros datos y con 30 iteraciones.
+
+```{r, echo=TRUE}
+km_clusters <- kmeans(x = cX, centers = 4, nstart = 30)
+```
+
+
+Representamos dichos clusters en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2).
+
+```{r}
+fviz_cluster(object = km_clusters, data = cX, show.clust.cent = TRUE, geom ="point",
+ ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, palette = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8")) +
+theme_bw() +
+theme(legend.position = "none")
+```
+
+
+
+##
+
+Observemos el dendograma
+
+```{r, cache =TRUE}
+res = hcut(cX, k=4, stand = TRUE)
+fviz_dend(res, rect = TRUE, cex = 0.5, k_colors = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8"))
+```
+
+
+
+
+##
+
+Sería interesante ver si estos clusters corresponden a las fases de cirrosis segun la variable `stage`. Veamos la tabla de frecuencias:
+
+<center>
+<img src="tabla_freqs.png" width="300px"/>
+</center>
+
+No se corresponden con los clusters. Simplemente podemos decir:
+
+- Pacientes en **Stage 1**: Cluster 2
+- Pacientes en **Stage 2**: Cluster 2
+- Pacientes en **Stage 3**: Cluster 2
+- Pacientes en **Stage 4**: Cluster 1 y 2
+
+
+
 
 
 

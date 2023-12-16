@@ -329,7 +329,7 @@ fviz_nbclust(resnumclust)
 ```
 
 
-Vamos a calcular los 4 clusters con nuestros datos y con 30 iteraciones. Además, vamos a visualizar como ha quedado la partición.
+Vamos a calcular las 4 k-medias con nuestros datos y con 30 iteraciones. Además, vamos a visualizar como ha quedado la partición.
 
 ```{r}
 #set.seed(2312)
@@ -337,16 +337,15 @@ km_clusters <- kmeans(x = cX, centers = 4, nstart = 30)
 km_clusters$cluster
 ```
 
-Ahora bien, representemos dichos clusters en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2)
+Ahora bien, representemos dichos clusters en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2).
 
 ```{r}
 fviz_cluster(object = km_clusters, data = cX, show.clust.cent = TRUE, geom ="point",
- ellipse.type = "euclid", star.plot = TRUE, repel = TRUE) +
+ ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, palette = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8")) +
 theme_bw() +
 theme(legend.position = "none")
 ```
 Como podemos var, al menos en la proyección en 2 dimensiones, hay bastante solapamiento. Además, si vemos la zona pintada como si fuera un intervalo de confianza, hay muchas observaciones que quedan fuera.
-
 
 
 ```{r, cache =TRUE}

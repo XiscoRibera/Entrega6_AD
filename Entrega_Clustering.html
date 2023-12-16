@@ -151,6 +151,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Recordatorio</h1>
 <p>Vamos a tratar una base de datos relacionados con la predicción de riesgo de cirrosis. La cirrosis es una etapa tardía de la cicatrización (fibrosis) del hígado causada por muchas formas de enfermedades y afecciones hepáticas, como la hepatitis y el alcoholismo crónico.</p>
 <p>Nuestro objetivo para este estudio sería estudiar algunos perfiles con riesgo de padecer cirrosis.</p>
+<p>Los datos provienen de la página web Kaggle: <a href="https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset/">Kaggle - Cirrhosis</a>.</p>
 <p>Recordemos nuestra tabla de datos:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">"cirrosis_tidy.csv"</span>,  <span class="at">header =</span> <span class="cn">TRUE</span> )</span>
@@ -357,7 +358,7 @@ Conclusion
 <p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Vamos a calcular los 4 clusters con nuestros datos y con 30 iteraciones. Además, vamos a visualizar como ha quedado la partición.</p>
+<p>Vamos a calcular las 4 k-medias con nuestros datos y con 30 iteraciones. Además, vamos a visualizar como ha quedado la partición.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#set.seed(2312)</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>km_clusters <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(<span class="at">x =</span> cX, <span class="at">centers =</span> <span class="dv">4</span>, <span class="at">nstart =</span> <span class="dv">30</span>)</span>
@@ -373,10 +374,10 @@ Conclusion
 [260] 2 2 1 2 2 2 2 1 2 4 2 2 2 1 1 2 3</code></pre>
 </div>
 </div>
-<p>Ahora bien, representemos dichos clusters en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2)</p>
+<p>Ahora bien, representemos dichos clusters en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(<span class="at">object =</span> km_clusters, <span class="at">data =</span> cX, <span class="at">show.clust.cent =</span> <span class="cn">TRUE</span>, <span class="at">geom =</span><span class="st">"point"</span>,</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a> <span class="at">ellipse.type =</span> <span class="st">"euclid"</span>, <span class="at">star.plot =</span> <span class="cn">TRUE</span>, <span class="at">repel =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a> <span class="at">ellipse.type =</span> <span class="st">"euclid"</span>, <span class="at">star.plot =</span> <span class="cn">TRUE</span>, <span class="at">repel =</span> <span class="cn">TRUE</span>, <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"#FF7078"</span>, <span class="st">"#F39B4C"</span>, <span class="st">"#7FBFF5"</span>, <span class="st">"#A298E8"</span>)) <span class="sc">+</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -685,16 +686,7 @@ of ggplot2 3.3.4.
 275 311     2       2
 276 312     2       3</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="dv">100</span><span class="sc">*</span><span class="fu">prop.table</span>(<span class="fu">table</span>(<span class="at">x =</span> tabla_cluster[,<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>)])), <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>     Cluster
-Stage      1      2      3      4
-    1  0.362  3.623  0.000  0.362
-    2  2.536 15.942  1.087  1.812
-    3  4.348 27.174  5.435  3.261
-    4 16.304 11.232  5.435  1.087</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">x =</span> tabla_cluster[,<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">x =</span> tabla_cluster[,<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     Cluster
 Stage  1  2  3  4
@@ -710,19 +702,19 @@ Stage  1  2  3  4
 <h2 class="anchored" data-anchor-id="k-medoids-pam">K-medoids (PAM)</h2>
 <p>En este caso, cada cluster está representado por una observación presente en el cluster (medoid), mientras que en K-means cada cluster está representado por su centroide, que se corresponde con el promedio de todas las observaciones del cluster pero con ninguna en particular.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(<span class="at">x =</span> cX, <span class="at">FUNcluster =</span> pam, <span class="at">method =</span> <span class="st">"wss"</span>,</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a> <span class="at">diss =</span> <span class="fu">dist</span>(datos, <span class="at">method =</span> <span class="st">"euclidean"</span>)) <span class="sc">+</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">6</span>, <span class="at">linetype =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(<span class="at">x =</span> cX, <span class="at">FUNcluster =</span> pam, <span class="at">method =</span> <span class="st">"wss"</span>,</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a> <span class="at">diss =</span> <span class="fu">dist</span>(datos, <span class="at">method =</span> <span class="st">"euclidean"</span>)) <span class="sc">+</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">6</span>, <span class="at">linetype =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>pam_clusters <span class="ot">&lt;-</span> <span class="fu">pam</span>(<span class="at">x =</span> cX, <span class="at">k =</span> <span class="dv">6</span>, <span class="at">metric =</span> <span class="st">"euclidean"</span>)</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(<span class="at">object =</span> pam_clusters, <span class="at">data =</span> cX, <span class="at">ellipse.type =</span> <span class="st">"t"</span>, <span class="at">geom =</span> <span class="st">"point"</span>,  <span class="at">repel =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>pam_clusters <span class="ot">&lt;-</span> <span class="fu">pam</span>(<span class="at">x =</span> cX, <span class="at">k =</span> <span class="dv">6</span>, <span class="at">metric =</span> <span class="st">"euclidean"</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(<span class="at">object =</span> pam_clusters, <span class="at">data =</span> cX, <span class="at">ellipse.type =</span> <span class="st">"t"</span>, <span class="at">geom =</span> <span class="st">"point"</span>,  <span class="at">repel =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -731,11 +723,11 @@ Stage  1  2  3  4
 <section id="dendograma" class="level2">
 <h2 class="anchored" data-anchor-id="dendograma">Dendograma</h2>
 <div class="cell" data-hash="Entrega_Clustering_cache/html/unnamed-chunk-25_4f4ba6f84080bfcb883bd6dbc7b1c018">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">101</span>)</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>hc_completo <span class="ot">&lt;-</span> datos_quant <span class="sc">%&gt;%</span> <span class="fu">scale</span>() <span class="sc">%&gt;%</span> <span class="fu">dist</span>(<span class="at">method =</span> <span class="st">"euclidean"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a> <span class="fu">hclust</span>(<span class="at">method =</span> <span class="st">"complete"</span>)</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_dend</span>(<span class="at">x =</span> hc_completo, <span class="at">k =</span> <span class="dv">3</span>, <span class="at">cex =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a> <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">10.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">101</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>hc_completo <span class="ot">&lt;-</span> datos_quant <span class="sc">%&gt;%</span> <span class="fu">scale</span>() <span class="sc">%&gt;%</span> <span class="fu">dist</span>(<span class="at">method =</span> <span class="st">"euclidean"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a> <span class="fu">hclust</span>(<span class="at">method =</span> <span class="st">"complete"</span>)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_dend</span>(<span class="at">x =</span> hc_completo, <span class="at">k =</span> <span class="dv">3</span>, <span class="at">cex =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a> <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">10.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: The `&lt;scale&gt;` argument of `guides()` cannot be `FALSE`. Use "none" instead as
 of ggplot2 3.3.4.
@@ -751,7 +743,7 @@ of ggplot2 3.3.4.
 <h2 class="anchored" data-anchor-id="análisis-de-componentes-principales">Análisis de Componentes Principales</h2>
 <p>Calculamos las componentes principales con el comando <code>prcomp</code> utilizando nuestro dataset, sin escalar los datos ya que están todos en la misma escala. Por último, los consideramos centrados en el 0.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>datos.acp<span class="ot">=</span><span class="fu">prcomp</span>(cX, <span class="at">scale =</span> <span class="cn">FALSE</span>, <span class="at">center =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>datos.acp<span class="ot">=</span><span class="fu">prcomp</span>(cX, <span class="at">scale =</span> <span class="cn">FALSE</span>, <span class="at">center =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Los valores propios muestran el porcentaje de varianza explicada por cada componente principal.</p>
 <div class="cell">
