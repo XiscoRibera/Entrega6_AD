@@ -191,21 +191,24 @@ fviz_nbclust(x = cX, FUNcluster = kmeans, method = "wss",
 Realmente, con el método del codo, es un poco complicado establemcer un $k$ óptimo, así que vamos a utilizar otros métodos que nos proporciona `R`:
 
 ```{r}
-fviz_nbclust(x = cX, FUNcluster = kmeans, method = "silhouette")
+fviz_nbclust(x = cX, FUNcluster = kmeans, method = "silhouette", 
+ diss = dist(cX, method = "euclidean"))
 ```
 
 ```{r}
-fviz_nbclust(x = cX, FUNcluster = kmeans, method = "gap_stat")
+fviz_nbclust(x = cX, FUNcluster = kmeans, method = "gap_stat", 
+ diss = dist(cX, method = "euclidean"))
 ```
 
-Con el método de la silueta, nos sugiere escoger $k=2$, en cambio, con el siguiente, nos sugiere 8 clusters. Como no hemos salido de dudas, vamos a realizar otro experimento: vamos a realizar una función que nos proporciona 30 índices para determinar el número de clusters.
+Con el método de la silueta, nos sugiere escoger $k=2$, en cambio, con el siguiente, nos sugiere $8$ clusters. Como no hemos salido de dudas, realicemos clusters para $k =2,4,8$ 
 
-```{r, cache=TRUE, eval=FALSE}
+
+
+```{r, cache=TRUE, eval=FALSE, echo=FALSE}
+# vamos a realizar otro experimento: vamos a realizar una función que nos proporciona 30 índices para determinar el número de clusters.
 resnumclust = NbClust(data = cX, distance = "euclidean", min.nc = 2, max.nc = 10, 
                       method = "kmeans", index = "alllong")
-```
 
-```{r, cache=TRUE, eval=FALSE}
 # fix the functions
 fviz_nbclust <- function (x, FUNcluster = NULL, method = c("silhouette", "wss", 
                                            "gap_stat"), diss = NULL, k.max = 10, nboot = 100, verbose = interactive(), 
@@ -312,47 +315,76 @@ environment(fviz_nbclust) <- asNamespace("factoextra")
 assignInNamespace("fviz_nbclust",fviz_nbclust,"factoextra")
 environment(.viz_NbClust) <- asNamespace("factoextra")
 assignInNamespace(".viz_NbClust",.viz_NbClust,"factoextra")
-```
 
-```{r, cache=TRUE, eval=FALSE}
+
+
 fviz_nbclust(resnumclust)
+
+# Vamos a calcular las 4 k-medias con nuestros datos y con 30 iteraciones. Además, vamos a visualizar como ha quedado la partición.
 ```
 
-Vamos a calcular las 4 k-medias con nuestros datos y con 30 iteraciones. Además, vamos a visualizar como ha quedado la partición.
+- 2 clusters:
 
 ```{r}
-#set.seed(2312)
-km_clusters <- kmeans(x = cX, centers = 4, nstart = 30)
+set.seed(232)
+km_clusters_2 <- kmeans(x = cX, centers = 2, nstart = 70)
 # km_clusters$cluster
 ```
 
 Ahora bien, representemos dichos clusters en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2).
 
 ```{r}
-fviz_cluster(object = km_clusters, data = cX, show.clust.cent = TRUE, geom ="point",
+fviz_cluster(object = km_clusters_2, data = cX, show.clust.cent = TRUE, geom ="point",
+ ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, palette = c("#FF7078", "#A298E8")) +
+theme_bw() +
+theme(legend.position = "none")
+```
+
+- 4 clusters:
+
+
+```{r}
+set.seed(232)
+km_clusters_4 <- kmeans(x = cX, centers = 4, nstart = 70)
+
+fviz_cluster(object = km_clusters_4, data = cX, show.clust.cent = TRUE, geom ="point",
  ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, palette = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8")) +
 theme_bw() +
 theme(legend.position = "none")
 ```
 
+- 8 clusters:
+
+
+```{r}
+set.seed(232)
+km_clusters_8 <- kmeans(x = cX, centers = 8, nstart = 70)
+
+fviz_cluster(object = km_clusters_8, data = cX, show.clust.cent = TRUE, geom ="point",
+ ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, palette = c("#FF7078", "#FF7F00", "#7FBFF5", "#8B3A62","#FFB90F", "#1C86EE",  "#FF3030", "#00CD00")) +
+theme_bw() +
+theme(legend.position = "none")
+```
+
+
 Como podemos ver, al menos en la proyección en 2 dimensiones, hay bastante solapamiento. Además, si vemos la zona pintada como si fuera un intervalo de confianza, hay muchas observaciones que quedan fuera.
 
 
-Ahora bien, sería interesante ver si estos clusters corresponden a las fases de cirrosis segun la variable `stage`.
+Ahora bien, sería interesante ver si el caso de k = 4, los clusters corresponden a las fases de cirrosis segun la variable `stage`.
 
 Vamos a crear un data frame compuesto de 3 columnas: identificador del paciente, estado de la enfermedad y cluster al que pertenece.
 
 ```{r}
 id_stage = datos %>% 
   select(ID, Stage)
-Cluster = km_clusters$cluster %>% as.factor()
+Cluster = km_clusters_4$cluster %>% as.factor()
 
 tabla_cluster = cbind(id_stage, Cluster)
 
 table(x = tabla_cluster[,c(2,3)])
 ```
 
-FATAL
+Observemos que en este caso un kmeans con $k=4$ no clusteriza en función del estado de cirrosis en que se encuentra el paciente.
 
 ## K-medoids (PAM)
 
@@ -375,18 +407,22 @@ fviz_nbclust(x = cX, FUNcluster = pam, method = "gap_stat",
  diss = dist(datos, method = "manhattan"))
 ```
 
-Estos dos métodos nos sugieren 2 clusters para realizar el análisis. Como en `kmeans`, podemos utilizar la misma función para corroborarlo con 30 índices, utilizando el método `median`, que es el más indicado para medoides:
+Estos dos métodos nos sugieren 2 clusters para realizar el análisis.
 
-```{r, cache=TRUE,, eval=FALSE}
+
+```{r, cache=TRUE,, eval=FALSE, echo=FALSE}
+# Como en `kmeans`, podemos utilizar la misma función para corroborarlo con 30 índices, utilizando el método `median`, que es el más indicado para medoides:
+
 resnumclust2 = NbClust(data = cX, distance = "euclidean", min.nc = 2, max.nc = 10, 
                       method = "median", index = "alllong")
 ```
 
-```{r, cache=TRUE, eval=FALSE}
+```{r, cache=TRUE, eval=FALSE, echo=FALSE}
 fviz_nbclust(resnumclust2)
+
+# Esta función nos sugiere escoger 2 clusters. De este modo, calculamos los clusters y los representamos
 ```
 
-Esta función nos sugiere escoger 2 clusters. De este modo, calculamos los clusters y los representamos.
 
 ```{r}
 pam_clusters <- pam(x = cX, k = 2, metric = "manhattan")
@@ -398,16 +434,27 @@ fviz_cluster(object = pam_clusters, data = cX, ellipse.type = "t", geom = "point
 
 Estan bastante solapados, puede deberse a la proyección a dos dimensiones.
 
-Realicemos kmedoids con k=4 para comparar:
+Realicemos kmedoids con $k=4$ para comparar con la variable `stage`:
 
 ```{r}
-pam_clusters_ <- pam(x = cX, k = 4, metric = "manhattan")
+pam_clusters_4 <- pam(x = cX, k = 4, metric = "manhattan")
 
-fviz_cluster(object = pam_clusters_, data = cX, ellipse.type = "t", geom = "point", repel =TRUE) +
+fviz_cluster(object = pam_clusters_4, data = cX, ellipse.type = "t", geom = "point", repel =TRUE) +
   theme_bw() + 
   theme(legend.position = "none")
 ```
+```{r}
+id_stage = datos %>% 
+  select(ID, Stage)
 
+Cluster_medoid = pam_clusters_4$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_stage, Cluster_medoid)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+
+Observemos que en este caso un kmedoids con $k=4$ tampoco clusteriza en función del estado de cirrosis en que se encuentra el paciente.
 
 ## Clara
 
@@ -466,7 +513,7 @@ fviz_dend(x = hc_average, k = 4, cex = 0.6) +
 
 - Dendograma para 4 clusters con distancia entre clusters *Ward's minimum variance*:
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, warning=FALSE}
 hc_ward_D2 <- mat_dist %>%
   hclust(method = "ward.D2") # Ward's minimum variance
 
@@ -500,7 +547,7 @@ cor(x = mat_dist, cophenetic(hc_ward_D2))
 Calculamos las componentes principales con el comando `prcomp` utilizando nuestro dataset, sin escalar los datos ya que están todos en la misma escala. Por último, los consideramos centrados en el 0.
 
 ```{r}
-datos.acp=prcomp(cX, scale = FALSE, center = FALSE)
+datos.acp=prcomp(datos_quant, scale = TRUE, center = TRUE)
 ```
 
 Los valores propios muestran el porcentaje de varianza explicada por cada componente principal.
@@ -573,40 +620,11 @@ Tambien apreciamos la calidad de representación de las variables a las componen
 round(res.var$cos2, 5)
 ```
 
-Respecto a las variables, hemos podido comprobar lo expuesto anteriormente, se aprecia una fuerte contribución de la variable `Agricultura` a la primera componente principal, además de una muy buena representación (un valor de cos2 muy elevado).
+Respecto a las variables, hemos podido comprobar lo expuesto anteriormente, se aprecia una important contribución de la variable `Bilirubin` a la primera componente principal, además de una muy buena representación (un valor de cos2 muy elevado).
 
-Seguidamente, la variable `Fábricas` tiene gran contribución a la segunda componente principal, con menor representación debido al valor de cos2 y que también contribuye a la primera componente principal, pero muy poco. En cambio, la variable `Servicios sociales y Personales` tiene más poca contribución a la segunda componente, pero está algo mejor representada por la primera que la variable anterior; de todos modos, la calidad de representación es más baja que las anteriores.
+Seguidamente, la variable `Platelets`, `Age` y `Cholesterol` tiene gran contribución a la segunda componente principal.
 
-No podemos destacar más variables ya que, como vimos en los gráficos, no habia prácticamente representación por parte de las componentes principales.
+Observemos que a variable `Cholesterol` a pesar de ser la tercera variable mejor representada por la segunda componente principal es la que mejor (de entre estas tres) está representa en conjunto con la CP1 y la CP2.
 
-#### Resultados por Observaciones
+# Conclusiones
 
-Ahora, respecto a las observaciones, empezamos por las coordenadas.
-
-```{r, echo=FALSE}
-res.obs=get_pca_ind(datos.acp)
-#round(res.obs$coord, 2)  #Coordenadas
-head(round(res.obs$coord, 2), 5)  #Coordenadas
-```
-
-También las contribuciones de cada observación a las componentes principales.
-
-```{r, echo=FALSE}
-#round(res.obs$contrib,2)  #Contribuciones a las CP
-head(round(res.obs$contrib,2), 5)  #Contribuciones a las CP
-```
-
-Por último, la calidad de representación, es decir, el valor de cos2.
-
-```{r, echo=FALSE}
-#round(res.obs$cos2,3)  # Calidad de la representación
-head(round(res.obs$cos2,3), 5)
-```
-
-```{r, echo=FALSE, eval=FALSE}
-autoplot(datos.acp, data = datos, colour = 'Grupo',
-         loadings = TRUE, loadings.colour = 'blue',
-         loadings.label = FALSE, loadings.label.size = 3, size = 3) +
-  geom_text_repel(aes(label = rownames(datos)), box.padding = 0.5, segment.color = "darkgrey", size = 3, color = "darkgrey") +
-  theme_bw()
-```
