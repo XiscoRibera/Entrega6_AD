@@ -728,7 +728,7 @@ $ Stage         &lt;fct&gt; 4, 3, 4, 4, 3, 3, 3, 2, 4, 4, 4, 3, 3, 3, 4, 4, 3, 4
 </div>
 </section>
 <section id="clara" class="slide level2">
-<h2>Clara</h2>
+<h2>CLARA</h2>
 <div class="panel-tabset">
 <ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1"><span class="math inline">\(k=2\)</span></a></li><li><a href="#tabset-3-2"><span class="math inline">\(k=4\)</span></a></li><li><a href="#tabset-3-3"><code>stage</code></a></li></ul>
 <div class="tab-content">
@@ -898,9 +898,9 @@ Prothrombin   0.15423 0.17348</code></pre>
 <div style="font-size: 20pt;">
 <p>Hemos podido comprobar lo expuesto anteriormente:</p>
 <ul>
-<li><p>Se aprecia una important contribución de la variable <code>Bilirubin</code> a la primera componente principal, además de una muy buena representación (un valor de cos2 muy elevado).</p></li>
+<li><p>Se aprecia una importante contribución de la variable <code>Bilirubin</code> a la primera componente principal, además de una muy buena representación (un valor de cos2 muy elevado).</p></li>
 <li><p>Seguidamente, la variable <code>Platelets</code>, <code>Age</code> y <code>Cholesterol</code> tiene gran contribución a la segunda componente principal.</p></li>
-<li><p>Observemos que la variable Cholesterol, a pesar de ser la tercera variable mejor representada por la segunda componente principal, es la que mejor (de entre estas tres) está representa en conjunto con la CP1 y la CP2.</p></li>
+<li><p>Observemos que la variable <code>Cholesterol</code>, a pesar de ser la tercera variable mejor representada por la segunda componente principal, es la que mejor (de entre estas tres) está representa en conjunto con la CP1 y la CP2.</p></li>
 </ul>
 </div>
 </div>
@@ -928,7 +928,7 @@ Prothrombin   0.15423 0.17348</code></pre>
 <li><p>Viendo este gráfico parece que clusteriza en función de la contribución de cada muestra a las componentes principales. Como la variable <code>Bilirubin</code> está bien representada por la primera componente principal, es normal que un cluster (círculos rojos) sean las muestras que más aportan a ésta.</p></li>
 <li><p>Luego están las muestras azules que corresponden a aquellas que parece que estan representadas por <code>Cholesterol</code> y <code>Platelets</code>.</p></li>
 <li><p>A continuación, encontramos las verdes que son las que estan más representadas por <code>Age</code>, que era una de las variables que mejor se representaba por la segunda componente principal.</p></li>
-<li><p>Y finalmente, encontramos el grupo lila que son las que estan mas representadas por <code>Albumin</code> que notemos que también contribuye bastante en la primera componente principal</p></li>
+<li><p>Y finalmente, encontramos el grupo lila que son las que estan más representadas por <code>Albumin</code> que notemos que también contribuye bastante en la primera componente principal</p></li>
 </ul>
 </div>
 </div>
@@ -944,8 +944,6 @@ Prothrombin   0.15423 0.17348</code></pre>
 <h2></h2>
 <div style="font-size: 20pt;">
 <ul>
-<li><p>Usando <em>k-means</em> es difícil establecer un número óptimo de clusters, pero hemos considerado <span class="math inline">\(4\)</span>.</p></li>
-<li><p>Usando <em>k-medoids</em>, el número óptimo de clusters es <span class="math inline">\(2\)</span> usando los tres métodos.</p></li>
 <li><p>Tanto <em>k-means</em> como <em>k-medoids</em> como <em>Clara</em>, con <span class="math inline">\(4\)</span> clusters no agrupa en función de la variable <code>stage</code>.</p></li>
 <li><p>Utilizando clasificación jerárquica, observamos que las distancias <em>Single or Minimum</em> y <em>Average</em> preservan mejor las distancias entre observaciones, en cambio <em>Ward’s minimum variance</em> en nustro caso no es recomendable usarla.</p></li>
 <li><p>En cuanto a ACP, observamos que la variable <code>Bilirubin</code> está bien representada por la primera componente principal. Seguidamente, la variable <code>Platelets</code>, <code>Age</code> y <code>Cholesterol</code> tiene gran contribución a la segunda componente principal.</p></li>

@@ -293,7 +293,7 @@ Un k-medoids con $k=4$ no clusteriza en función del estado de cirrosis en que s
 
 :::
 
-## Clara
+## CLARA
 
 ::: panel-tabset
 
@@ -457,11 +457,11 @@ round(res.var$cos2[,c(1,2)], 5)
 <div style="font-size: 20pt;">
 Hemos podido comprobar lo expuesto anteriormente:
 
-- Se aprecia una important contribución de la variable `Bilirubin` a la primera componente principal, además de una muy buena representación (un valor de cos2 muy elevado).
+- Se aprecia una importante contribución de la variable `Bilirubin` a la primera componente principal, además de una muy buena representación (un valor de cos2 muy elevado).
 
 - Seguidamente, la variable `Platelets`, `Age` y `Cholesterol` tiene gran contribución a la segunda componente principal.
 
-- Observemos que la variable Cholesterol, a pesar de ser la tercera variable mejor representada por la segunda componente principal, es la que mejor (de entre estas tres) está representa en conjunto con la CP1 y la CP2.
+- Observemos que la variable `Cholesterol`, a pesar de ser la tercera variable mejor representada por la segunda componente principal, es la que mejor (de entre estas tres) está representa en conjunto con la CP1 y la CP2.
 
 </div>
 :::
@@ -501,7 +501,7 @@ fviz_pca_biplot(datos.acp,  repel = TRUE,
 
 - A continuación, encontramos las verdes que son las que estan más representadas por `Age`, que era una de las variables que mejor se representaba por la segunda componente principal.
 
-- Y finalmente, encontramos el grupo lila que son las que estan mas representadas por `Albumin` que notemos que también contribuye bastante en la primera componente principal
+- Y finalmente, encontramos el grupo lila que son las que estan más representadas por `Albumin` que notemos que también contribuye bastante en la primera componente principal
 </div>
 :::
 
@@ -512,9 +512,6 @@ fviz_pca_biplot(datos.acp,  repel = TRUE,
 
 <div style="font-size: 20pt;">
 
-- Usando *k-means* es difícil establecer un número óptimo de clusters, pero hemos considerado $4$.
-
-- Usando *k-medoids*, el número óptimo de clusters es $2$ usando los tres métodos.
 
 - Tanto *k-means* como *k-medoids* como *Clara*, con $4$ clusters no agrupa en función de la variable `stage`.
 
