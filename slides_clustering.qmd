@@ -113,6 +113,8 @@ glimpse(datos)
 
 ### Variables
 
+::: panel-tabset
+
 #### Variables cuantitativas
 
 ```{r, echo=FALSE}
@@ -147,13 +149,11 @@ kable(tabla, format = "html", escape = FALSE) %>%
   kable_styling(font_size = 25)  # Ajusta el tamaño de la fuente
 ```
 
-##
-
 #### Variables cualitativas 
 
 <center><img src="summary.png" width="1000px"/></center>
 
-
+:::
 
 # Clustering
 
@@ -267,6 +267,50 @@ fviz_cluster(object = pam_clusters, data = cX, ellipse.type = "t", geom = "point
   theme(legend.position = "right")
 ```
 
+### `Sex`, `Drug` y `Hepatomegaly`
+
+<div style="font-size: 25pt;">
+
+- `Sex`
+```{r}
+id_sex = datos %>% 
+  select(ID, Sex)
+
+Cluster_medoid_2 = pam_clusters$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_sex, Cluster_medoid_2)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+
+- `Drug`
+```{r}
+id_drug = datos %>% 
+  select(ID, Drug)
+
+Cluster_medoid_2 = pam_clusters$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_drug, Cluster_medoid_2)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+
+-  `Hepatomegaly`
+```{r}
+id_hepatomegaly = datos %>% 
+  select(ID, Hepatomegaly)
+
+Cluster_medoid_2 = pam_clusters$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_hepatomegaly, Cluster_medoid_2)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+
+
+Observamos que los clusters con *k-medoids* con $k=2$ no se asemejan a la partición de ninguna de estas tres variables.
+</div>
+
 ### k-medoids con $k=4$
 
 ```{r}
@@ -307,6 +351,50 @@ fviz_cluster(object = clara_clusters_2, ellipse.type = "t", geom = "point") +
 theme_bw() +
 theme(legend.position = "right")
 ```
+
+### `Sex`, `Drug` y `Hepatomegaly`
+
+<div style="font-size: 25pt;">
+- `Sex`
+```{r}
+id_sex = datos %>% 
+  select(ID, Sex)
+
+Cluster_clara_2 = clara_clusters_2$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_sex, Cluster_clara_2)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+
+- `Drug`
+
+```{r}
+id_drug = datos %>% 
+  select(ID, Drug)
+
+Cluster_clara_2 = clara_clusters_2$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_drug, Cluster_clara_2)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+
+- `Hepatomegaly`
+```{r}
+id_hepatomegaly = datos %>% 
+  select(ID, Hepatomegaly)
+
+Cluster_clara_2 = clara_clusters_2$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_hepatomegaly, Cluster_clara_2)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+
+Observamos que *Clara* tampoco clusteriza en función de `Sex`, `Drug` ni `Hepatomegaly`.
+</div>
+
 
 ### $k=4$
 
@@ -524,8 +612,11 @@ fviz_pca_biplot(datos.acp,  repel = TRUE,
 </div>
 
 
+# Muchas gracias :))
 
-
+<div style="font-size: 30pt;">
+Irene Julià, Xisco Ribera
+</div>
 
 
 

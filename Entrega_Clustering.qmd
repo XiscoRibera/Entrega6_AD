@@ -260,6 +260,46 @@ fviz_cluster(object = pam_clusters, data = cX, ellipse.type = "t", geom = "point
 
 Estan bastante solapados, puede deberse a la proyección a dos dimensiones.
 
+Comparemos los clusters que se han realizado con la variable `sex`:
+
+```{r}
+id_sex = datos %>% 
+  select(ID, Sex)
+
+Cluster_medoid_2 = pam_clusters$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_sex, Cluster_medoid_2)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+Observemos que, en este caso, un *k-medoids* con $k=2$ no clusteriza en función del sexo biológico del paciente.
+
+Hagamos lo mismo con las variables `Drug` y `Hepatomegaly`
+
+```{r}
+id_drug = datos %>% 
+  select(ID, Drug)
+
+Cluster_medoid_2 = pam_clusters$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_drug, Cluster_medoid_2)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+
+```{r}
+id_hepatomegaly = datos %>% 
+  select(ID, Hepatomegaly)
+
+Cluster_medoid_2 = pam_clusters$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_hepatomegaly, Cluster_medoid_2)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+
+Observamos que tampoco clusteriza en función de `Drug` y `Hepatomegaly`.
+
 Realicemos *k-medoids* con $k=4$ para comparar con la variable `stage`:
 
 ```{r}
@@ -289,6 +329,7 @@ Este método combina los dos anteriores. dividiendo a partes iguales el conjunto
 
 Como en los casos anteirores han salido que $k=2, 4$ eran los óptimos, realicemos *Clara* con estos valores de $k$:
 
+### $k=2$
 ```{r}
 clara_clusters_2 <- clara(x = cX, k = 2, metric = "manhattan", stand = TRUE,
  samples = 50, pamLike = TRUE)
@@ -298,6 +339,49 @@ theme_bw() +
 theme(legend.position = "right")
 ```
 
+
+Comparemos los clusters que se han realizado con la variable `sex`:
+
+```{r}
+id_sex = datos %>% 
+  select(ID, Sex)
+
+Cluster_clara_2 = clara_clusters_2$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_sex, Cluster_clara_2)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+Observemos que, en este caso, el método *Clara* con $k=2$ no agrupa en función del sexo biológico del paciente.
+
+Hagamos lo mismo con las variables `Drug` y `Hepatomegaly`
+
+```{r}
+id_drug = datos %>% 
+  select(ID, Drug)
+
+Cluster_clara_2 = clara_clusters_2$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_drug, Cluster_clara_2)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+
+```{r}
+id_hepatomegaly = datos %>% 
+  select(ID, Hepatomegaly)
+
+Cluster_clara_2 = clara_clusters_2$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_hepatomegaly, Cluster_clara_2)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+
+Observamos que *Clara* tampoco clusteriza en función de `Drug` y `Hepatomegaly`.
+
+
+### $k=4$
 ```{r}
 clara_clusters_4 <- clara(x = cX, k = 4, metric = "manhattan", stand = TRUE,
  samples = 50, pamLike = TRUE)
