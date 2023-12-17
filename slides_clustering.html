@@ -396,7 +396,7 @@
     margin-top: 100px;
   }
   .reveal p {
-    font-size: 0.7em;
+    font-size: 0.8em;
   }
   </style>
 </head>
@@ -615,20 +615,9 @@ $ Stage         &lt;fct&gt; 4, 3, 4, 4, 3, 3, 3, 2, 4, 4, 4, 3, 3, 3, 4, 4, 3, 4
 <section id="section-3" class="slide level2">
 <h2></h2>
 <h4 id="variables-cualitativas">Variables cualitativas</h4>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>       Status                 Drug         Sex      Ascites  Hepatomegaly
- Cens     :147   D-penicillamine:136   Female:242   No:257   No:134      
- Cens_Trat: 18   Placebo        :140   Male  : 34   Si: 19   Si:142      
- Muerto   :111                                                           
-                                                                         
- Spiders  Edema     Stage  
- No:196   No :234   1: 12  
- Si: 80   Si : 17   2: 59  
-          Sin: 25   3:111  
-                    4: 94  </code></pre>
-</div>
-</div>
+<center>
+<img src="summary.png" width="1000px">
+</center>
 </section>
 <section>
 <section id="clustering" class="title-slide slide level1 center">
@@ -640,11 +629,11 @@ $ Stage         &lt;fct&gt; 4, 3, 4, 4, 3, 3, 3, 2, 4, 4, 4, 3, 3, 3, 4, 4, 3, 4
 <div style="font-size: 25pt;">
 <p>Escalamos y centramos los datos:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>datos2 <span class="ot">&lt;-</span> datos_quant <span class="sc">%&gt;%</span> <span class="fu">scale</span>()</span>
-<span id="cb4-2"><a href="#cb4-2"></a>n <span class="ot">&lt;-</span> <span class="fu">dim</span>(datos2)[<span class="dv">1</span>]</span>
-<span id="cb4-3"><a href="#cb4-3"></a>X <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(datos2)</span>
-<span id="cb4-4"><a href="#cb4-4"></a>Hn <span class="ot">&lt;-</span> <span class="fu">diag</span>(n)<span class="sc">-</span><span class="dv">1</span><span class="sc">/</span>n <span class="co"># matriz de centrado</span></span>
-<span id="cb4-5"><a href="#cb4-5"></a>cX <span class="ot">&lt;-</span> Hn<span class="sc">%*%</span>X <span class="co"># matriz centrada</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>datos2 <span class="ot">&lt;-</span> datos_quant <span class="sc">%&gt;%</span> <span class="fu">scale</span>()</span>
+<span id="cb3-2"><a href="#cb3-2"></a>n <span class="ot">&lt;-</span> <span class="fu">dim</span>(datos2)[<span class="dv">1</span>]</span>
+<span id="cb3-3"><a href="#cb3-3"></a>X <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(datos2)</span>
+<span id="cb3-4"><a href="#cb3-4"></a>Hn <span class="ot">&lt;-</span> <span class="fu">diag</span>(n)<span class="sc">-</span><span class="dv">1</span><span class="sc">/</span>n <span class="co"># matriz de centrado</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>cX <span class="ot">&lt;-</span> Hn<span class="sc">%*%</span>X <span class="co"># matriz centrada</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </section>
@@ -652,7 +641,7 @@ $ Stage         &lt;fct&gt; 4, 3, 4, 4, 3, 3, 3, 2, 4, 4, 4, 3, 3, 3, 4, 4, 3, 4
 <h2></h2>
 <h3 id="matriz-de-distancias">Matriz de distancias</h3>
 
-<img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"></section>
+<img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
 <section id="k-means" class="slide level2">
 <h2>K-means</h2>
 <div class="panel-tabset">
@@ -661,14 +650,14 @@ $ Stage         &lt;fct&gt; 4, 3, 4, 4, 3, 3, 3, 2, 4, 4, 4, 3, 3, 3, 4, 4, 3, 4
 <div id="tabset-1-1">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-9-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-8-1.png" width="960"></p>
 </div>
 </div>
 </div>
 <div id="tabset-1-2">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-10-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-9-1.png" width="960"></p>
 </div>
 </div>
 </div>
@@ -692,54 +681,44 @@ $ Stage         &lt;fct&gt; 4, 3, 4, 4, 3, 3, 3, 2, 4, 4, 4, 3, 3, 3, 4, 4, 3, 4
 <div id="tabset-2-1">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-11-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-10-1.png" width="960"></p>
 </div>
-</div>
-<div style="font-size: 25pt;">
-<p>No queda muy claro…</p>
 </div>
 </div>
 <div id="tabset-2-2">
-<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-12_f1ad238e755c1cc1db5e879a9fdddc4c">
+<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-11_c3e5b75be89259cf5a9573ccdeb2020e">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-12-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-11-1.png" width="960"></p>
 </div>
 </div>
 </div>
 <div id="tabset-2-3">
-<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-13_dc55a23bc8343e03ea1dc5fcdfea0505">
+<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-12_1efed680ab1d42eb22a4039e81165374">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-13-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-12-1.png" width="960"></p>
 </div>
 </div>
 </div>
 <div id="tabset-2-4">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-14-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-13-1.png" width="960"></p>
 </div>
 </div>
 </div>
 <div id="tabset-2-5">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-15-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-14-1.png" width="960"></p>
 </div>
 </div>
 </div>
 <div id="tabset-2-6">
 <div style="font-size: 35pt;">
 
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>     Cluster_medoid
-Stage  1  2  3  4
-    1  0  8  3  1
-    2  8 28 22  1
-    3 17 46 34 14
-    4 46 24 17  7</code></pre>
-</div>
-</div>
+<center>
+<img src="tabla_freqs2.png" width="400px">
+</center>
 </div>
 <div style="font-size: 25pt;">
 <p>Un k-medoids con <span class="math inline">\(k=4\)</span> no clusteriza en función del estado de cirrosis en que se encuentra el paciente.</p>
@@ -756,30 +735,23 @@ Stage  1  2  3  4
 <div id="tabset-3-1">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-17-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-15-1.png" width="960"></p>
 </div>
 </div>
 </div>
 <div id="tabset-3-2">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-18-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-16-1.png" width="960"></p>
 </div>
 </div>
 </div>
 <div id="tabset-3-3">
 <div style="font-size: 35pt;">
 
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>     Cluster_clara
-Stage  1  2  3  4
-    1  0  8  3  1
-    2  2 28 27  2
-    3  3 53 38 17
-    4 34 28 23  9</code></pre>
-</div>
-</div>
+<center>
+<img src="tabla_freqs3.png" width="400px">
+</center>
 </div>
 <div style="font-size: 25pt;">
 <p>El método Clara con <span class="math inline">\(k=4\)</span> tampoco clusteriza en función de la fase de cirrosis en que se encuentra el paciente.</p>
@@ -794,30 +766,30 @@ Stage  1  2  3  4
 <ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Complete or Maximum</a></li><li><a href="#tabset-4-2">Single or Minimum</a></li><li><a href="#tabset-4-3">Average</a></li><li><a href="#tabset-4-4">Ward’s minimum variance</a></li><li><a href="#tabset-4-5">Preserva distancias</a></li></ul>
 <div class="tab-content">
 <div id="tabset-4-1">
-<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-20_11e2a1d98f14fedb6237a523148703ef">
+<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-17_6c9473e28cb6cf7cccbeb1ab4467de0e">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-20-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-17-1.png" width="960"></p>
 </div>
 </div>
 </div>
 <div id="tabset-4-2">
-<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-21_23e7f95b6b328b1eb4e488b0c87ce9b3">
+<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-18_e5115f75094bbfe359513abbf74c2a78">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-21-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-18-1.png" width="960"></p>
 </div>
 </div>
 </div>
 <div id="tabset-4-3">
-<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-22_d473a1bf64c51271ea74d08bdfd58aaf">
+<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-19_b69bad1550f9f363042179a558b525cc">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-22-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-19-1.png" width="960"></p>
 </div>
 </div>
 </div>
 <div id="tabset-4-4">
-<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-23_6503fc9a6411127e8915199cc0427d55">
+<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-20_86595ed472ee3ccb051ce9de3b5376aa">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-23-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-20-1.png" width="960"></p>
 </div>
 </div>
 </div>
@@ -829,10 +801,10 @@ Stage  1  2  3  4
 <li><p>Cuanto más cercano a 1 sea el valor, mejor refleja el dendograma las distancias originales.</p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_completo))</span>
-<span id="cb7-2"><a href="#cb7-2"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_single))</span>
-<span id="cb7-3"><a href="#cb7-3"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_average))</span>
-<span id="cb7-4"><a href="#cb7-4"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_ward_D2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_completo))</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_single))</span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_average))</span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_ward_D2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.6545671
 [1] 0.8451853
@@ -853,50 +825,38 @@ Stage  1  2  3  4
 <section id="acp" class="slide level2">
 <h2>ACP</h2>
 <div class="panel-tabset">
-<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Análisis</a></li><li><a href="#tabset-5-2">Círculo de correlación</a></li><li><a href="#tabset-5-3">Cos2</a></li><li><a href="#tabset-5-4"><code>biplot</code></a></li><li><a href="#tabset-5-5">Resultado por variables</a></li><li><a href="#tabset-5-6">Observaciones</a></li></ul>
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Análisis</a></li><li><a href="#tabset-5-2">Círculo de correlación</a></li><li><a href="#tabset-5-3">Cos2</a></li><li><a href="#tabset-5-4">Resultado por variables</a></li><li><a href="#tabset-5-5">Observaciones</a></li></ul>
 <div class="tab-content">
 <div id="tabset-5-1">
 <div style="font-size: 20pt;">
-<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-25_a805c6d5bf4ae12055befd1fc48b24d7">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>datos.acp<span class="ot">=</span><span class="fu">prcomp</span>(datos_quant, <span class="at">scale =</span> <span class="cn">TRUE</span>, <span class="at">center =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb9-2"><a href="#cb9-2"></a>lambdas <span class="ot">=</span> <span class="fu">get_eigenvalue</span>(datos.acp)</span>
-<span id="cb9-3"><a href="#cb9-3"></a></span>
-<span id="cb9-4"><a href="#cb9-4"></a><span class="fu">fviz_eig</span>(datos.acp, <span class="at">addlabels =</span> <span class="cn">TRUE</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-22_88d4de8ed9dbc97744c50cc74a45cf9f">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>datos.acp<span class="ot">=</span><span class="fu">prcomp</span>(datos_quant, <span class="at">scale =</span> <span class="cn">TRUE</span>, <span class="at">center =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-2"><a href="#cb6-2"></a></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="fu">fviz_eig</span>(datos.acp, <span class="at">addlabels =</span> <span class="cn">TRUE</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-25-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-22-1.png" width="960"></p>
 </div>
 </div>
-<ul>
-<li>Usando el criterio del codo, nos quedaremos con <span class="math inline">\(2\)</span> o <span class="math inline">\(3\)</span> CPs</li>
-<li>Nos quedamos con 2 CPs ya que el análisis es junto a clustering que su representación es sobre 2 CPs.</li>
-</ul>
 </div>
 </div>
 <div id="tabset-5-2">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-26-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-23-1.png" width="960"></p>
 </div>
 </div>
 </div>
 <div id="tabset-5-3">
 <div style="font-size: 20pt;">
-<p>calidad de representación, realizaremos un gráfico de cos2</p>
+
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-27-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-24-1.png" width="960"></p>
 </div>
 </div>
 </div>
 <div id="tabset-5-4">
-<div class="cell">
-<div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-28-1.png" width="960"></p>
-</div>
-</div>
-</div>
-<div id="tabset-5-5">
 <div style="font-size: 20pt;">
 <p>Empezamos por las contribuciones de las variables a las primeras dos componentes principales.</p>
 <div class="cell">
@@ -934,7 +894,7 @@ Prothrombin   0.15423 0.17348</code></pre>
 </div>
 </div>
 </div>
-<div id="tabset-5-6">
+<div id="tabset-5-5">
 <div style="font-size: 20pt;">
 <p>Hemos podido comprobar lo expuesto anteriormente:</p>
 <ul>
@@ -957,17 +917,19 @@ Prothrombin   0.15423 0.17348</code></pre>
 <p>Pintemos ahora el mismo gráfico <code>biplot</code>, pero coloreadolo en función de los clusters que se nos habían generado en k-means:</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-31-1.png" width="960"></p>
+<p><img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-27-1.png" width="960"></p>
 </div>
 </div>
 </div>
 </div>
 <div id="tabset-6-2">
 <div style="font-size: 20pt;">
-<p>Viendo este gráfico parece que clusteriza en función de la contribución de cada muestra a las componentes principales. Como la variable <code>Bilirubin</code> está bien representada por la primera componente principal, es normal que un cluster (círculos rojos) sean las muestras que más aportan a ésta.</p>
-<p>Luego están las muestras azules que corresponden a aquellas que parece que estan representadas por <code>Cholesterol</code> y <code>Platelets</code>.</p>
-<p>A continuación, encontramos las verdes que son las que estan más representadas por <code>Age</code>, que era una de las variables que mejor se representaba por la segunda componente principal.</p>
-<p>Y finalmente, encontramos el grupo lila que son las que estan mas representadas por <code>Albumin</code> que notemos que también contribuye bastante en la primera componente principal</p>
+<ul>
+<li><p>Viendo este gráfico parece que clusteriza en función de la contribución de cada muestra a las componentes principales. Como la variable <code>Bilirubin</code> está bien representada por la primera componente principal, es normal que un cluster (círculos rojos) sean las muestras que más aportan a ésta.</p></li>
+<li><p>Luego están las muestras azules que corresponden a aquellas que parece que estan representadas por <code>Cholesterol</code> y <code>Platelets</code>.</p></li>
+<li><p>A continuación, encontramos las verdes que son las que estan más representadas por <code>Age</code>, que era una de las variables que mejor se representaba por la segunda componente principal.</p></li>
+<li><p>Y finalmente, encontramos el grupo lila que son las que estan mas representadas por <code>Albumin</code> que notemos que también contribuye bastante en la primera componente principal</p></li>
+</ul>
 </div>
 </div>
 </div>
@@ -982,10 +944,10 @@ Prothrombin   0.15423 0.17348</code></pre>
 <h2></h2>
 <div style="font-size: 20pt;">
 <ul>
-<li><p>Usando <em>k-means</em> es difícil establecer un número óptimo de clusters, ya que con el método <code>wss</code> era complicado establemcer un <span class="math inline">\(k\)</span> óptimo; con el método <code>silhouette</code> no decía que el <span class="math inline">\(k\)</span> óptimo era <span class="math inline">\(2\)</span>; y el método <code>gap_stat</code> decía <span class="math inline">\(k=8\)</span>.</p></li>
+<li><p>Usando <em>k-means</em> es difícil establecer un número óptimo de clusters, pero hemos considerado <span class="math inline">\(4\)</span>.</p></li>
 <li><p>Usando <em>k-medoids</em>, el número óptimo de clusters es <span class="math inline">\(2\)</span> usando los tres métodos.</p></li>
 <li><p>Tanto <em>k-means</em> como <em>k-medoids</em> como <em>Clara</em>, con <span class="math inline">\(4\)</span> clusters no agrupa en función de la variable <code>stage</code>.</p></li>
-<li><p>Utilizando dendogramas, o clasificación jerárquica, observamos que las distancias <em>Single or Minimum</em> y <em>Average</em> preservan mejor las distancias entre observaciones, en cambio <em>Ward’s minimum variance</em> en nustro caso no es recomendable usarla.</p></li>
+<li><p>Utilizando clasificación jerárquica, observamos que las distancias <em>Single or Minimum</em> y <em>Average</em> preservan mejor las distancias entre observaciones, en cambio <em>Ward’s minimum variance</em> en nustro caso no es recomendable usarla.</p></li>
 <li><p>En cuanto a ACP, observamos que la variable <code>Bilirubin</code> está bien representada por la primera componente principal. Seguidamente, la variable <code>Platelets</code>, <code>Age</code> y <code>Cholesterol</code> tiene gran contribución a la segunda componente principal.</p></li>
 <li><p>Los clusters que se han realizado con <span class="math inline">\(k=4\)</span> parecen estar hechos en función de la calidad de representación de las variables que más bien estan representadas por las dos primeras componentes principales.</p></li>
 </ul>

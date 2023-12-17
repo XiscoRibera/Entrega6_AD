@@ -21,7 +21,7 @@ include-in-header:
         margin-top: 100px;
       }
       .reveal p {
-        font-size: 0.7em;
+        font-size: 0.8em;
       }
       </style>
 ---
@@ -147,13 +147,13 @@ kable(tabla, format = "html", escape = FALSE) %>%
   kable_styling(font_size = 25)  # Ajusta el tamaño de la fuente
 ```
 
-## 
+##
 
-#### Variables cualitativas
+#### Variables cualitativas 
 
-```{r, echo=FALSE}
-summary(datos_qual)
-```
+<center><img src="summary.png" width="1000px"/></center>
+
+
 
 # Clustering
 
@@ -172,6 +172,7 @@ Hn <- diag(n)-1/n # matriz de centrado
 cX <- Hn%*%X # matriz centrada
 ```
 </div>
+
 ## 
 
 ### Matriz de distancias
@@ -238,9 +239,7 @@ fviz_nbclust(x = cX, FUNcluster = pam, method = "wss",
  diss = dist(datos, method = "manhattan"))
 ```
 
-<div style="font-size: 25pt;">
-No queda muy claro...
-</div>
+
 
 
 
@@ -279,17 +278,11 @@ fviz_cluster(object = pam_clusters_4, data = cX, ellipse.type = "t", geom = "poi
 ```
 
 ### `stage`
+
 <div style="font-size: 35pt;"></center>
-```{r}
-id_stage = datos %>% 
-  select(ID, Stage)
 
-Cluster_medoid = pam_clusters_4$clustering %>% as.factor()
+<center><img src="tabla_freqs2.png" width="400px"/></center>
 
-tabla_cluster = cbind(id_stage, Cluster_medoid)
-
-table(x = tabla_cluster[,c(2,3)])
-```
 </div>
 
 <div style="font-size: 25pt;">
@@ -330,16 +323,7 @@ theme(legend.position = "right")
 
 <div style="font-size: 35pt;"></center>
 
-```{r}
-id_stage = datos %>% 
-  select(ID, Stage)
-
-Cluster_clara = clara_clusters_4$clustering %>% as.factor()
-
-tabla_cluster = cbind(id_stage, Cluster_clara)
-
-table(x = tabla_cluster[,c(2,3)])
-```
+<center><img src="tabla_freqs3.png" width="400px"/></center>
 
 </div>
 
@@ -425,13 +409,11 @@ cor(x = mat_dist, cophenetic(hc_ward_D2))
 
 ```{r, echo=TRUE, cache=TRUE}
 datos.acp=prcomp(datos_quant, scale = TRUE, center = TRUE)
-lambdas = get_eigenvalue(datos.acp)
 
 fviz_eig(datos.acp, addlabels = TRUE, ylim=c(0,100))
 ```
 
-- Usando el criterio del codo, nos quedaremos con $2$ o $3$ CPs
-- Nos quedamos con 2 CPs ya que el análisis es junto a clustering que su representación es sobre 2 CPs.
+
 </div>
 
 ### Círculo de correlación
@@ -444,7 +426,6 @@ fviz_pca_var(datos.acp, axes = c(1,2), col.var = "contrib",
 
 ### Cos2
 <div style="font-size: 20pt;">
-calidad de representación, realizaremos un gráfico de cos2
 </div>
 
 ```{r, echo=FALSE}
@@ -452,15 +433,6 @@ var <- get_pca_var(datos.acp)
 fviz_cos2(datos.acp, choice = "var", axes = 1:2)
 ```
 
-### `biplot`
-
-```{r, echo=FALSE}
-fviz_pca_biplot(datos.acp,  repel = TRUE,
-                col.var = "#2E9FDF", # color para las variables
-                col.ind = "#696969",  # color para las observaciones
-                geom = "point"
-                )
-```
 
 ### Resultado por variables
 
@@ -523,26 +495,30 @@ fviz_pca_biplot(datos.acp,  repel = TRUE,
 
 ### Observaciones
 <div style="font-size: 20pt;">
-Viendo este gráfico parece que clusteriza en función de la contribución de cada muestra a las componentes principales. Como la variable `Bilirubin` está bien representada por la primera componente principal, es normal que un cluster (círculos rojos) sean las muestras que más aportan a ésta.
+- Viendo este gráfico parece que clusteriza en función de la contribución de cada muestra a las componentes principales. Como la variable `Bilirubin` está bien representada por la primera componente principal, es normal que un cluster (círculos rojos) sean las muestras que más aportan a ésta.
 
-Luego están las muestras azules que corresponden a aquellas que parece que estan representadas por `Cholesterol` y `Platelets`. 
+- Luego están las muestras azules que corresponden a aquellas que parece que estan representadas por `Cholesterol` y `Platelets`. 
 
-A continuación, encontramos las verdes que son las que estan más representadas por `Age`, que era una de las variables que mejor se representaba por la segunda componente principal.
+- A continuación, encontramos las verdes que son las que estan más representadas por `Age`, que era una de las variables que mejor se representaba por la segunda componente principal.
 
-Y finalmente, encontramos el grupo lila que son las que estan mas representadas por `Albumin` que notemos que también contribuye bastante en la primera componente principal
+- Y finalmente, encontramos el grupo lila que son las que estan mas representadas por `Albumin` que notemos que también contribuye bastante en la primera componente principal
 </div>
 :::
+
+
 # Conclusiones
 
 ##
+
 <div style="font-size: 20pt;">
-- Usando *k-means* es difícil establecer un número óptimo de clusters, ya que con el método `wss` era complicado establemcer un $k$ óptimo; con el método `silhouette` no decía que el $k$ óptimo era $2$; y el método `gap_stat` decía $k=8$.
+
+- Usando *k-means* es difícil establecer un número óptimo de clusters, pero hemos considerado $4$.
 
 - Usando *k-medoids*, el número óptimo de clusters es $2$ usando los tres métodos.
 
 - Tanto *k-means* como *k-medoids* como *Clara*, con $4$ clusters no agrupa en función de la variable `stage`.
 
-- Utilizando dendogramas, o clasificación jerárquica, observamos que las distancias *Single or Minimum* y *Average* preservan mejor las distancias entre observaciones, en cambio *Ward's minimum variance* en nustro caso no es recomendable usarla.
+- Utilizando clasificación jerárquica, observamos que las distancias *Single or Minimum* y *Average* preservan mejor las distancias entre observaciones, en cambio *Ward's minimum variance* en nustro caso no es recomendable usarla.
 
 - En cuanto a ACP, observamos que la variable `Bilirubin` está bien representada por la primera componente principal. Seguidamente, la variable `Platelets`, `Age` y `Cholesterol` tiene gran contribución a la segunda componente principal.
 
