@@ -71,7 +71,7 @@ El tibble resultante consta de 276 observaciones y 20 variables. Cada muestra re
 -   `Alk_Phos`: Fosfatasa alcalina \[U/liter\]
 -   `SGOT`: SGOT \[U/ml\]
 -   `Triglycerides`: Triglicéridos \[mg/dl\]
--   `Platelets`: Plaquetas por cúbico \[ml/1000\]
+-   `Platelets`: Plaquetas por centímetro cúbico \[ml/1000\]
 -   `Prothrombin`: Tiempo de Protrombina \[s\]
 -   `Stage`: Estado histórico de la enfermedad (1, 2, 3, or 4)
 
