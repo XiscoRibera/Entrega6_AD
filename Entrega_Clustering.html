@@ -318,7 +318,7 @@ W = 0.83366, p-value &lt; 2.2e-16</code></pre>
 </div>
 </div>
 <p>El método del codo nos sugiere considerar 4 clusters, aunque no sea demasiado clara la decisión. De todas formas, otro motivo para considerar 4 es para poder comparar con la variable <code>Stage</code> que tiene 4 niveles.</p>
-<p>Calculamos dichos clusters:</p>
+<p>Calculamos los 4 centroides:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">232</span>)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>km_clusters_4 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(<span class="at">x =</span> cX, <span class="at">centers =</span> <span class="dv">4</span>, <span class="at">nstart =</span> <span class="dv">70</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -605,17 +605,17 @@ Dim.11    0.32946          2.99511                   100.00000</code></pre>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>                  PC1     PC2
-N_Days         0.3585  0.2066
-Age           -0.1023 -0.4465
-Bilirubin     -0.4919  0.0652
-Cholesterol   -0.2640  0.4403
-Albumin        0.3257  0.2734
-Copper        -0.3962 -0.0226
-Alk_Phos      -0.1544  0.2527
-SGOT          -0.3326  0.2131
-Tryglicerides -0.3010  0.2445
-Platelets      0.0885  0.4649
-Prothrombin   -0.2311 -0.3154</code></pre>
+N_Days         0.3585 -0.2066
+Age           -0.1023  0.4465
+Bilirubin     -0.4919 -0.0652
+Cholesterol   -0.2640 -0.4403
+Albumin        0.3257 -0.2734
+Copper        -0.3962  0.0226
+Alk_Phos      -0.1544 -0.2527
+SGOT          -0.3326 -0.2131
+Tryglicerides -0.3010 -0.2445
+Platelets      0.0885 -0.4649
+Prothrombin   -0.2311  0.3154</code></pre>
 </div>
 </div>
 <p>Observemos que la primera componente principal da un peso muy elevado y negativo a la variable <code>Bilirubin</code>.</p>

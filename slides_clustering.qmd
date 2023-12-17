@@ -6,7 +6,7 @@ title-slide-attributes:
     data-background-opacity: "1"
 format: 
   revealjs:
-    #smaller: FALSE
+    smaller: TRUE
     scrollable: TRUE
     transition: 'slide' # 'slide', 'fade', 'convex', 'concave', 'zoom', etc.
 editor: visual
@@ -25,6 +25,7 @@ include-in-header:
       }
       </style>
 ---
+
 
 
 ```{r, warning=FALSE, message=FALSE, echo=FALSE}
@@ -50,7 +51,6 @@ library(knitr)
 library(kableExtra)
 ```
 
-
 ### Presentación del problema
 
 <span style="font-size: 0.8em;">
@@ -67,20 +67,13 @@ library(kableExtra)
 
 </span>
 
-
-
-<center>
-
-<img src="Foto_cirrosis.jpg" width="700px"/>
-
-</center>
+<center><img src="Foto_cirrosis.jpg" width="700px"/></center>
 
 </p>
 
 </div>
 
 ## 
-
 
 ### Objetivo del estudio
 
@@ -90,17 +83,13 @@ Establecer un perfil de paciente para cada fase de la cirrosis utilizando cluste
 
 <p style="text-align:center;">
 
-<center>
-
-<img src="Foto2.jpg" width="600px"/>
-
-</center>
+<center><img src="Foto2.jpg" width="600px"/></center>
 
 </p>
 
 </div>
 
-## {.smaller}
+##  {.smaller}
 
 Cargamos los datos y arreglamos las variables:
 
@@ -115,8 +104,6 @@ datos = datos %>% mutate(Ascites = Ascites %>% as.factor,
                          Sex = Sex %>% as.factor,
                          Status = Status %>% as.factor)
 ```
-
-
 
 ```{r}
 glimpse(datos)
@@ -168,32 +155,26 @@ kable(tabla, format = "html", escape = FALSE) %>%
 summary(datos_qual)
 ```
 
-
 # Clustering
 
 
+## Escalar y centrar
 
-Vamos a escoger los datos cuantitativos y los valos a escalar.
+<div style="font-size: 25pt;">
+
+Escalamos y centramos los datos:
 
 ```{r, echo=TRUE}
 datos2 <- datos_quant %>% scale()
-```
-
-
-A continuación, los centramos.
-
-```{r, echo=TRUE}
 n <- dim(datos2)[1]
 X <- as.matrix(datos2)
 Hn <- diag(n)-1/n # matriz de centrado
 cX <- Hn%*%X # matriz centrada
 ```
-
-
-##
+</div>
+## 
 
 ### Matriz de distancias
-
 
 ```{r}
 mat_dist <- dist(x = cX, method = "euclidean")
@@ -204,11 +185,11 @@ fviz_dist(dist.obj = mat_dist, lab_size = 5) +
  theme(legend.position = "none")
 ```
 
-
-
 ## K-means
 
-En nuestro caso, no sabemos en cuantos clusters o grupos esta dividido nuestro dataset. Por tanto, vamos a estimar al número $k$ óptimo para aplicar el método de `kmeans()`:
+::: panel-tabset
+
+### Estimación k óptimo
 
 ```{r}
 fviz_nbclust(x = cX, FUNcluster = kmeans, method = "wss",
@@ -218,37 +199,364 @@ fviz_nbclust(x = cX, FUNcluster = kmeans, method = "wss",
 
 
 
-##
 
-Vamos a calcular los 4 centroides con nuestros datos y con 30 iteraciones.
+### k-means
 
 ```{r}
 set.seed(232)
 km_clusters_4 <- kmeans(x = cX, centers = 4, nstart = 70)
-```
 
-
-Representamos dichos clusters en el plano, utilizando las 2 primeras componentes principales:
-
-```{r}
 fviz_cluster(object = km_clusters_4, data = cX, show.clust.cent = TRUE, geom ="point",
  ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, palette = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8")) +
 theme_bw() +
 theme(legend.position = "right")
 ```
 
+### `stage`
 
-##
+<div style="font-size: 25pt;">
 
 Sería interesante ver si estos clusters corresponden a las fases de cirrosis segun la variable `stage`. Veamos la tabla de frecuencias:
 
-
-<center>
-<img src="tabla_freqs.png" width="300px"/>
-</center>
-
+<center><img src="tabla_freqs.png" width="300px"/></center>
 
 Un kmeans con $k=4$ no clusteriza en función del estado de cirrosis en que se encuentra el paciente.
+
+</div>
+
+:::
+
+
+## K-medoids (PAM)
+
+::: panel-tabset
+
+### Estimación del $k$ óptimo
+
+```{r}
+fviz_nbclust(x = cX, FUNcluster = pam, method = "wss",
+ diss = dist(datos, method = "manhattan"))
+```
+
+<div style="font-size: 25pt;">
+No queda muy claro...
+</div>
+
+
+
+### Método `silhouette`
+
+```{r, cache=TRUE}
+fviz_nbclust(x = cX, FUNcluster = pam, method = "silhouette",
+ diss = dist(datos, method = "manhattan"))
+```
+
+### Método `gap_stat`
+
+```{r, cache=TRUE}
+fviz_nbclust(x = cX, FUNcluster = pam, method = "gap_stat",
+ diss = dist(datos, method = "manhattan"))
+```
+
+### k-medoids
+
+```{r}
+pam_clusters <- pam(x = cX, k = 2, metric = "manhattan")
+
+fviz_cluster(object = pam_clusters, data = cX, ellipse.type = "t", geom = "point", repel =TRUE) +
+  theme_bw() + 
+  theme(legend.position = "right")
+```
+
+### k-medoids con $k=4$
+
+```{r}
+pam_clusters_4 <- pam(x = cX, k = 4, metric = "manhattan")
+
+fviz_cluster(object = pam_clusters_4, data = cX, ellipse.type = "t", geom = "point", repel =TRUE) +
+  theme_bw() + 
+  theme(legend.position = "right")
+```
+
+### `stage`
+<div style="font-size: 35pt;"></center>
+```{r}
+id_stage = datos %>% 
+  select(ID, Stage)
+
+Cluster_medoid = pam_clusters_4$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_stage, Cluster_medoid)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+</div>
+
+<div style="font-size: 25pt;">
+Un k-medoids con $k=4$ no clusteriza en función del estado de cirrosis en que se encuentra el paciente.
+
+</div>
+
+
+:::
+
+## Clara
+
+::: panel-tabset
+
+### $k=2$
+
+```{r}
+clara_clusters_2 <- clara(x = cX, k = 2, metric = "manhattan", stand = TRUE,
+ samples = 50, pamLike = TRUE)
+
+fviz_cluster(object = clara_clusters_2, ellipse.type = "t", geom = "point") +
+theme_bw() +
+theme(legend.position = "right")
+```
+
+### $k=4$
+
+```{r}
+clara_clusters_4 <- clara(x = cX, k = 4, metric = "manhattan", stand = TRUE,
+ samples = 50, pamLike = TRUE)
+
+fviz_cluster(object = clara_clusters_4, ellipse.type = "t", geom = "point") +
+theme_bw() +
+theme(legend.position = "right")
+```
+
+### `stage`
+
+<div style="font-size: 35pt;"></center>
+
+```{r}
+id_stage = datos %>% 
+  select(ID, Stage)
+
+Cluster_clara = clara_clusters_4$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_stage, Cluster_clara)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+
+</div>
+
+<div style="font-size: 25pt;">
+El método Clara con $k=4$ tampoco clusteriza en función de la fase de cirrosis en que se encuentra el paciente.
+</div>
+:::
+
+## Dendogramas
+
+::: panel-tabset
+### Complete or Maximum
+```{r, cache=TRUE}
+hc_completo <- mat_dist %>%
+  hclust(method = "complete") # Complete or Maximum
+
+fviz_dend(x = hc_completo, k = 4, cex = 0.6) +
+  geom_hline(yintercept = 11.2, linetype = "dashed") +
+  geom_hline(yintercept = 9.6, linetype = "dashed")
+```
+
+### Single or Minimum
+
+
+```{r, cache=TRUE}
+hc_single <- mat_dist %>%
+  hclust(method = "single") # Single or Minimum
+
+fviz_dend(x = hc_single, k = 4, cex = 0.6) +
+ geom_hline(yintercept = 5.9, linetype = "dashed")+
+  geom_hline(yintercept = 5.1, linetype = "dashed")
+```
+
+
+### Average
+```{r, cache=TRUE}
+hc_average <- mat_dist %>%
+  hclust(method = "average") # Average
+
+fviz_dend(x = hc_average, k = 4, cex = 0.6) +
+ geom_hline(yintercept = 8.8, linetype = "dashed")+
+  geom_hline(yintercept = 7, linetype = "dashed")
+```
+
+### Ward’s minimum variance
+```{r, cache=TRUE}
+hc_ward_D2 <- mat_dist %>%
+  hclust(method = "ward.D2") # Ward's minimum variance
+
+fviz_dend(x = hc_ward_D2, k = 4, cex = 0.6) +
+ geom_hline(yintercept = 25, linetype = "dashed")+
+  geom_hline(yintercept = 18, linetype = "dashed")
+```
+
+### Preserva distancias
+
+<div style="font-size: 25pt;">
+
+- Hay que comprobar que la estructura preserva bien las distancias originales entre las observaciones.
+
+- Usamos el coeficiente de correlación entre las distancias *cophenetic* del dendrograma y la matriz de distancias original.
+
+- Cuanto más cercano a 1 sea el valor, mejor refleja el dendograma las distancias originales.
+
+```{r, echo=TRUE, results='hold'}
+cor(x = mat_dist, cophenetic(hc_completo))
+cor(x = mat_dist, cophenetic(hc_single))
+cor(x = mat_dist, cophenetic(hc_average))
+cor(x = mat_dist, cophenetic(hc_ward_D2))
+```
+
+</div>
+:::
+
+# Análisis de Componentes Principales
+
+## ACP
+::: panel-tabset
+
+### Análisis
+
+<div style="font-size: 20pt;">
+
+```{r, echo=TRUE, cache=TRUE}
+datos.acp=prcomp(datos_quant, scale = TRUE, center = TRUE)
+lambdas = get_eigenvalue(datos.acp)
+
+fviz_eig(datos.acp, addlabels = TRUE, ylim=c(0,100))
+```
+
+- Usando el criterio del codo, nos quedaremos con $2$ o $3$ CPs
+- Nos quedamos con 2 CPs ya que el análisis es junto a clustering que su representación es sobre 2 CPs.
+</div>
+
+### Círculo de correlación
+
+```{r, echo=FALSE}
+fviz_pca_var(datos.acp, axes = c(1,2), col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE)
+```
+
+### Cos2
+<div style="font-size: 20pt;">
+calidad de representación, realizaremos un gráfico de cos2
+</div>
+
+```{r, echo=FALSE}
+var <- get_pca_var(datos.acp)
+fviz_cos2(datos.acp, choice = "var", axes = 1:2)
+```
+
+### `biplot`
+
+```{r, echo=FALSE}
+fviz_pca_biplot(datos.acp,  repel = TRUE,
+                col.var = "#2E9FDF", # color para las variables
+                col.ind = "#696969",  # color para las observaciones
+                geom = "point"
+                )
+```
+
+### Resultado por variables
+
+<div style="font-size: 20pt;">
+
+Empezamos por las contribuciones de las variables a las primeras dos componentes principales.
+
+```{r, echo=FALSE}
+res.var=get_pca_var(datos.acp)
+round(res.var$contrib[,c(1,2)], 4)      # Contribuciones a las CP
+```
+
+Tambien apreciamos la calidad de representación de las variables a las componentes principales.
+
+```{r, echo=FALSE}
+round(res.var$cos2[,c(1,2)], 5)
+```
+</div>
+
+### Observaciones
+
+<div style="font-size: 20pt;">
+Hemos podido comprobar lo expuesto anteriormente:
+
+- Se aprecia una important contribución de la variable `Bilirubin` a la primera componente principal, además de una muy buena representación (un valor de cos2 muy elevado).
+
+- Seguidamente, la variable `Platelets`, `Age` y `Cholesterol` tiene gran contribución a la segunda componente principal.
+
+- Observemos que la variable Cholesterol, a pesar de ser la tercera variable mejor representada por la segunda componente principal, es la que mejor (de entre estas tres) está representa en conjunto con la CP1 y la CP2.
+
+</div>
+:::
+
+## ACP + Clustering
+
+:::panel-tabset
+
+
+### `Biplot`
+
+<div style="font-size: 20pt;">
+Pintemos ahora el mismo gráfico `biplot`, pero coloreadolo en función de los clusters que se nos habían generado en k-means:
+
+```{r}
+Cluster_4means = km_clusters_4$cluster %>% as.factor()
+
+datos.acp$clusters = Cluster_4means
+
+
+
+fviz_pca_biplot(datos.acp,  repel = TRUE,
+                col.var = "grey", # color para las variables
+                col.ind = Cluster_4means,  # color para las observaciones
+                geom = "point"
+                )
+
+```
+
+</div>
+
+### Observaciones
+<div style="font-size: 20pt;">
+Viendo este gráfico parece que clusteriza en función de la contribución de cada muestra a las componentes principales. Como la variable `Bilirubin` está bien representada por la primera componente principal, es normal que un cluster (círculos rojos) sean las muestras que más aportan a ésta.
+
+Luego están las muestras azules que corresponden a aquellas que parece que estan representadas por `Cholesterol` y `Platelets`. 
+
+A continuación, encontramos las verdes que son las que estan más representadas por `Age`, que era una de las variables que mejor se representaba por la segunda componente principal.
+
+Y finalmente, encontramos el grupo lila que son las que estan mas representadas por `Albumin` que notemos que también contribuye bastante en la primera componente principal
+</div>
+:::
+# Conclusiones
+
+##
+<div style="font-size: 20pt;">
+- Usando *k-means* es difícil establecer un número óptimo de clusters, ya que con el método `wss` era complicado establemcer un $k$ óptimo; con el método `silhouette` no decía que el $k$ óptimo era $2$; y el método `gap_stat` decía $k=8$.
+
+- Usando *k-medoids*, el número óptimo de clusters es $2$ usando los tres métodos.
+
+- Tanto *k-means* como *k-medoids* como *Clara*, con $4$ clusters no agrupa en función de la variable `stage`.
+
+- Utilizando dendogramas, o clasificación jerárquica, observamos que las distancias *Single or Minimum* y *Average* preservan mejor las distancias entre observaciones, en cambio *Ward's minimum variance* en nustro caso no es recomendable usarla.
+
+- En cuanto a ACP, observamos que la variable `Bilirubin` está bien representada por la primera componente principal. Seguidamente, la variable `Platelets`, `Age` y `Cholesterol` tiene gran contribución a la segunda componente principal.
+
+- Los clusters que se han realizado con $k=4$ parecen estar hechos en función de la calidad de representación de las variables que más bien estan representadas por las dos primeras componentes principales.
+
+</div>
+
+
+
+
+
+
+
+
 
 
 
