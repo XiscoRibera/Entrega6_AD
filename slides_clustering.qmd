@@ -6,7 +6,7 @@ title-slide-attributes:
     data-background-opacity: "1"
 format: 
   revealjs:
-    smaller: true
+    #smaller: FALSE
     scrollable: TRUE
     transition: 'slide' # 'slide', 'fade', 'convex', 'concave', 'zoom', etc.
 editor: visual
@@ -19,6 +19,9 @@ include-in-header:
         color: #b22222;
         text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
         margin-top: 100px;
+      }
+      .reveal p {
+        font-size: 0.7em;
       }
       </style>
 ---
@@ -50,6 +53,8 @@ library(kableExtra)
 
 ### Presentación del problema
 
+<span style="font-size: 0.8em;">
+
 -   Base de datos relacionados con la cirrosis.
 
 -   Fuente: [Kaggle - Cirrhosis](https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset/)
@@ -60,9 +65,13 @@ library(kableExtra)
 
 <p style="text-align:center;">
 
+</span>
+
+
+
 <center>
 
-<img src="Foto_cirrosis.jpg" width="800px"/>
+<img src="Foto_cirrosis.jpg" width="700px"/>
 
 </center>
 
@@ -75,7 +84,7 @@ library(kableExtra)
 
 ### Objetivo del estudio
 
-Establecer grupos de pacientes diferenciados y relacionarlos con algunos perfiles de pacientes de cirrosis.
+Establecer un perfil de paciente para cada fase de la cirrosis utilizando clustering.
 
 <div>
 
@@ -91,7 +100,7 @@ Establecer grupos de pacientes diferenciados y relacionarlos con algunos perfile
 
 </div>
 
-## 
+## {.smaller}
 
 Cargamos los datos y arreglamos las variables:
 
@@ -199,185 +208,47 @@ fviz_dist(dist.obj = mat_dist, lab_size = 5) +
 
 ## K-means
 
-En nuestro caso, no sabemos en cuantos clusters o grupos esta dividido nuestro dataset. Por tanto, vamos a estimar al número $k$ óptimo para aplicar el método de `kmeans()`. Para ello, utilizaremos la función `fviz_nbclust()`:
+En nuestro caso, no sabemos en cuantos clusters o grupos esta dividido nuestro dataset. Por tanto, vamos a estimar al número $k$ óptimo para aplicar el método de `kmeans()`:
 
 ```{r}
 fviz_nbclust(x = cX, FUNcluster = kmeans, method = "wss",
- diss = dist(cX, method = "euclidean"))
+ diss = dist(cX, method = "euclidean"))+
+  geom_vline(xintercept = 4, linetype = 2)
 ```
+
 
 
 ##
 
-Vamos a realizar otro experimento: vamos a realizar una función que nos proporciona 30 índices para determinar el número de clusters.
-
-```{r, cache=TRUE, eval=FALSE}
-resnumclust = NbClust(data = cX, distance = "euclidean", min.nc = 2, max.nc = 10, 
-                      method = "kmeans", index = "alllong")
-```
-
-```{r, echo=FALSE}
-# fix the functions
-fviz_nbclust <- function (x, FUNcluster = NULL, method = c("silhouette", "wss", 
-                                           "gap_stat"), diss = NULL, k.max = 10, nboot = 100, verbose = interactive(), 
-          barfill = "steelblue", barcolor = "steelblue", linecolor = "steelblue", 
-          print.summary = TRUE, ...) 
-{
-  set.seed(123)
-  if (k.max < 2) 
-    stop("k.max must bet > = 2")
-  method = match.arg(method)
-  if (!inherits(x, c("data.frame", "matrix")) & !("Best.nc" %in% 
-                                                  names(x))) 
-    stop("x should be an object of class matrix/data.frame or ", 
-         "an object created by the function NbClust() [NbClust package].")
-  if (inherits(x, "list") & "Best.nc" %in% names(x)) {
-    best_nc <- x$Best.nc
-    if (any(class(best_nc) == "numeric") ) 
-      print(best_nc)
-    else if (any(class(best_nc) == "matrix") )
-      .viz_NbClust(x, print.summary, barfill, barcolor)
-  }
-  else if (is.null(FUNcluster)) 
-    stop("The argument FUNcluster is required. ", "Possible values are kmeans, pam, hcut, clara, ...")
-  else if (!is.function(FUNcluster)) {
-    stop("The argument FUNcluster should be a function. ", 
-         "Check if you're not overriding the specified function name somewhere.")
-  }
-  else if (method %in% c("silhouette", "wss")) {
-    if (is.data.frame(x)) 
-      x <- as.matrix(x)
-    if (is.null(diss)) 
-      diss <- stats::dist(x)
-    v <- rep(0, k.max)
-    if (method == "silhouette") {
-      for (i in 2:k.max) {
-        clust <- FUNcluster(x, i, ...)
-        v[i] <- .get_ave_sil_width(diss, clust$cluster)
-      }
-    }
-    else if (method == "wss") {
-      for (i in 1:k.max) {
-        clust <- FUNcluster(x, i, ...)
-        v[i] <- .get_withinSS(diss, clust$cluster)
-      }
-    }
-    df <- data.frame(clusters = as.factor(1:k.max), y = v, 
-                     stringsAsFactors = TRUE)
-    ylab <- "Total Within Sum of Square"
-    if (method == "silhouette") 
-      ylab <- "Average silhouette width"
-    p <- ggpubr::ggline(df, x = "clusters", y = "y", group = 1, 
-                        color = linecolor, ylab = ylab, xlab = "Number of clusters k", 
-                        main = "Optimal number of clusters")
-    if (method == "silhouette") 
-      p <- p + geom_vline(xintercept = which.max(v), linetype = 2, 
-                          color = linecolor)
-    return(p)
-  }
-  else if (method == "gap_stat") {
-    extra_args <- list(...)
-    gap_stat <- cluster::clusGap(x, FUNcluster, K.max = k.max, 
-                                 B = nboot, verbose = verbose, ...)
-    if (!is.null(extra_args$maxSE)) 
-      maxSE <- extra_args$maxSE
-    else maxSE <- list(method = "firstSEmax", SE.factor = 1)
-    p <- fviz_gap_stat(gap_stat, linecolor = linecolor, 
-                       maxSE = maxSE)
-    return(p)
-  }
-}
-
-.viz_NbClust <- function (x, print.summary = TRUE, barfill = "steelblue", 
-          barcolor = "steelblue") 
-{
-  best_nc <- x$Best.nc
-  if (any(class(best_nc) == "numeric") )
-    print(best_nc)
-  else if (any(class(best_nc) == "matrix") ) {
-    best_nc <- as.data.frame(t(best_nc), stringsAsFactors = TRUE)
-    best_nc$Number_clusters <- as.factor(best_nc$Number_clusters)
-    if (print.summary) {
-      ss <- summary(best_nc$Number_clusters)
-      cat("* Among all indices: \n===================\n")
-      for (i in 1:length(ss)) {
-        cat("*", ss[i], "proposed ", names(ss)[i], 
-            "as the best number of clusters\n")
-      }
-      cat("\n \t *****Conclusion*****\n\n")
-      cat("* According to the majority rule, the best number of clusters is ", 
-          names(which.max(ss)), ".\n\n")
-    }
-    df <- data.frame(Number_clusters = names(ss), freq = ss, 
-                     stringsAsFactors = TRUE)
-    p <- ggpubr::ggbarplot(df, x = "Number_clusters", 
-                           y = "freq", fill = barfill, color = barcolor) + 
-      labs(x = "Number of clusters k", y = "Frequency among all indices", 
-           title = paste0("Optimal number of clusters - k = ", 
-                          names(which.max(ss))))
-    return(p)
-  }
-}
-# assign them to the factoextra namespace
-environment(fviz_nbclust) <- asNamespace("factoextra")
-assignInNamespace("fviz_nbclust",fviz_nbclust,"factoextra")
-environment(.viz_NbClust) <- asNamespace("factoextra")
-assignInNamespace(".viz_NbClust",.viz_NbClust,"factoextra")
-```
-
-
-
-```{r, cache=TRUE}
-fviz_nbclust(resnumclust)
-```
-
-
-##
-
-Vamos a calcular las 4 k-medias con nuestros datos y con 30 iteraciones.
-
-```{r, echo=TRUE}
-km_clusters <- kmeans(x = cX, centers = 4, nstart = 30)
-```
-
-
-Representamos dichos clusters en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2).
+Vamos a calcular los 4 centroides con nuestros datos y con 30 iteraciones.
 
 ```{r}
-fviz_cluster(object = km_clusters, data = cX, show.clust.cent = TRUE, geom ="point",
+set.seed(232)
+km_clusters_4 <- kmeans(x = cX, centers = 4, nstart = 70)
+```
+
+
+Representamos dichos clusters en el plano, utilizando las 2 primeras componentes principales:
+
+```{r}
+fviz_cluster(object = km_clusters_4, data = cX, show.clust.cent = TRUE, geom ="point",
  ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, palette = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8")) +
 theme_bw() +
-theme(legend.position = "none")
+theme(legend.position = "right")
 ```
-
-
-
-##
-
-Observemos el dendograma
-
-```{r, cache =TRUE}
-res = hcut(cX, k=4, stand = TRUE)
-fviz_dend(res, rect = TRUE, cex = 0.5, k_colors = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8"))
-```
-
-
 
 
 ##
 
 Sería interesante ver si estos clusters corresponden a las fases de cirrosis segun la variable `stage`. Veamos la tabla de frecuencias:
 
+
 <center>
 <img src="tabla_freqs.png" width="300px"/>
 </center>
 
-No se corresponden con los clusters. Simplemente podemos decir:
 
-- Pacientes en **Stage 1**: Cluster 2
-- Pacientes en **Stage 2**: Cluster 2
-- Pacientes en **Stage 3**: Cluster 2
-- Pacientes en **Stage 4**: Cluster 1 y 2
+Un kmeans con $k=4$ no clusteriza en función del estado de cirrosis en que se encuentra el paciente.
 
 
 

@@ -191,7 +191,7 @@ fviz_nbclust(x = cX, FUNcluster = kmeans, method = "wss",
 ```
 El método del codo nos sugiere considerar 4 clusters, aunque no sea demasiado clara la decisión. De todas formas, otro motivo para considerar 4 es para poder comparar con la variable `Stage` que tiene 4 niveles.
 
-Calculamos dichos clusters:
+Calculamos los 4 centroides:
 
 ```{r}
 set.seed(232)

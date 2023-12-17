@@ -395,6 +395,9 @@
     text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
     margin-top: 100px;
   }
+  .reveal p {
+    font-size: 0.7em;
+  }
   </style>
 </head>
 <body class="quarto-light">
@@ -416,6 +419,7 @@ Irene LiFeng Julià Pérez &amp; Xisco Ribera Ramis
 <section class="slide level2">
 
 <h3 id="presentación-del-problema">Presentación del problema</h3>
+<p><span style="font-size: 0.8em;"></span></p>
 <ul>
 <li><p>Base de datos relacionados con la cirrosis.</p></li>
 <li><p>Fuente: <a href="https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset/">Kaggle - Cirrhosis</a></p></li>
@@ -423,8 +427,9 @@ Irene LiFeng Julià Pérez &amp; Xisco Ribera Ramis
 </ul>
 <div>
 <p style="text-align:center;">
-</p><center>
-<p><img src="Foto_cirrosis.jpg" width="800px"></p>
+</p><p></p>
+<center>
+<p><img src="Foto_cirrosis.jpg" width="700px"></p>
 </center>
 <p></p>
 </div>
@@ -432,7 +437,7 @@ Irene LiFeng Julià Pérez &amp; Xisco Ribera Ramis
 <section id="section" class="slide level2">
 <h2></h2>
 <h3 id="objetivo-del-estudio">Objetivo del estudio</h3>
-<p>Establecer grupos de pacientes diferenciados y relacionarlos con algunos perfiles de pacientes de cirrosis.</p>
+<p>Establecer un perfil de paciente para cada fase de la cirrosis utilizando clustering.</p>
 <div>
 <p style="text-align:center;">
 </p><center>
@@ -441,7 +446,7 @@ Irene LiFeng Julià Pérez &amp; Xisco Ribera Ramis
 <p></p>
 </div>
 </section>
-<section id="section-1" class="slide level2">
+<section id="section-1" class="slide level2 smaller">
 <h2></h2>
 <p>Cargamos los datos y arreglamos las variables:</p>
 <div class="cell">
@@ -647,59 +652,22 @@ $ Stage         &lt;fct&gt; 4, 3, 4, 4, 3, 3, 3, 2, 4, 4, 4, 3, 3, 3, 4, 4, 3, 4
 <img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"></section>
 <section id="k-means" class="slide level2">
 <h2>K-means</h2>
-<p>En nuestro caso, no sabemos en cuantos clusters o grupos esta dividido nuestro dataset. Por tanto, vamos a estimar al número <span class="math inline">\(k\)</span> óptimo para aplicar el método de <code>kmeans()</code>. Para ello, utilizaremos la función <code>fviz_nbclust()</code>:</p>
+<p>En nuestro caso, no sabemos en cuantos clusters o grupos esta dividido nuestro dataset. Por tanto, vamos a estimar al número <span class="math inline">\(k\)</span> óptimo para aplicar el método de <code>kmeans()</code>:</p>
 
 <img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-10-1.png" width="960" class="r-stretch"></section>
 <section id="section-5" class="slide level2">
 <h2></h2>
-<p>Vamos a realizar otro experimento: vamos a realizar una función que nos proporciona 30 índices para determinar el número de clusters.</p>
-<div class="cell" data-hash="slides_clustering_cache/revealjs/unnamed-chunk-13_fbf3803868b3632144ab1f8fb60c4a28">
-<div class="cell-output cell-output-stdout">
-<pre><code>* Among all indices: 
-===================
-* 2 proposed  0 as the best number of clusters
-* 1 proposed  1 as the best number of clusters
-* 8 proposed  2 as the best number of clusters
-* 1 proposed  3 as the best number of clusters
-* 10 proposed  4 as the best number of clusters
-* 1 proposed  7 as the best number of clusters
-* 1 proposed  8 as the best number of clusters
-* 3 proposed  9 as the best number of clusters
-* 3 proposed  10 as the best number of clusters
+<p>Vamos a calcular los 4 centroides con nuestros datos y con 30 iteraciones.</p>
+<p>Representamos dichos clusters en el plano, utilizando las 2 primeras componentes principales:</p>
 
-     *****Conclusion*****
-* According to the majority rule, the best number of clusters is  4 .</code></pre>
-</div>
-
-</div>
-<img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-13-1.png" width="960" class="r-stretch"></section>
+<img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-12-1.png" width="960" class="r-stretch"></section>
 <section id="section-6" class="slide level2">
-<h2></h2>
-<p>Vamos a calcular las 4 k-medias con nuestros datos y con 30 iteraciones.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>km_clusters <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(<span class="at">x =</span> cX, <span class="at">centers =</span> <span class="dv">4</span>, <span class="at">nstart =</span> <span class="dv">30</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Representamos dichos clusters en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2).</p>
-
-<img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-15-1.png" width="960" class="r-stretch"></section>
-<section id="section-7" class="slide level2">
-<h2></h2>
-<p>Observemos el dendograma</p>
-
-<img data-src="slides_clustering_files/figure-revealjs/unnamed-chunk-16-1.png" width="960" class="r-stretch"></section>
-<section id="section-8" class="slide level2">
 <h2></h2>
 <p>Sería interesante ver si estos clusters corresponden a las fases de cirrosis segun la variable <code>stage</code>. Veamos la tabla de frecuencias:</p>
 <center>
 <img src="tabla_freqs.png" width="300px">
 </center>
-<p>No se corresponden con los clusters. Simplemente podemos decir:</p>
-<ul>
-<li>Pacientes en <strong>Stage 1</strong>: Cluster 2</li>
-<li>Pacientes en <strong>Stage 2</strong>: Cluster 2</li>
-<li>Pacientes en <strong>Stage 3</strong>: Cluster 2</li>
-<li>Pacientes en <strong>Stage 4</strong>: Cluster 1 y 2</li>
-</ul>
+<p>Un kmeans con <span class="math inline">\(k=4\)</span> no clusteriza en función del estado de cirrosis en que se encuentra el paciente.</p>
 <div class="footer footer-default">
 
 </div>
@@ -730,13 +698,13 @@ $ Stage         &lt;fct&gt; 4, 3, 4, 4, 3, 3, 3, 2, 4, 4, 4, 3, 3, 3, 4, 4, 3, 4
       Reveal.initialize({
 'controlsAuto': true,
 'previewLinksAuto': false,
-'smaller': true,
+'smaller': false,
 'pdfSeparateFragments': false,
 'autoAnimateEasing': "ease",
 'autoAnimateDuration': 1,
 'autoAnimateUnmatched': true,
 'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
-'smaller': true,
+'smaller': false,
  
         // Display controls in the bottom right corner
         controls: false,
