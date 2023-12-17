@@ -310,7 +310,7 @@ W = 0.83366, p-value &lt; 2.2e-16</code></pre>
 </div>
 <section id="k-means" class="level2">
 <h2 class="anchored" data-anchor-id="k-means">K-means</h2>
-<p>En nuestro caso, no sabemos en cuantos clusters o grupos esta dividido nuestro dataset. Por tanto, vamos a estimar al número <span class="math inline">\(k\)</span> óptimo para aplicar el método de <code>kmeans()</code>. Para ello, utilizaremos la función <code>fviz_nbclust()</code>:</p>
+<p>En nuestro caso, no sabemos en cuantos clusters o grupos esta dividido nuestro dataset. Por tanto, vamos a estimar al número <span class="math inline">\(k\)</span> óptimo para aplicar el método de <em>k-means</em>. Para ello, utilizaremos la función <code>fviz_nbclust()</code>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(<span class="at">x =</span> cX, <span class="at">FUNcluster =</span> kmeans, <span class="at">method =</span> <span class="st">"wss"</span>,</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a> <span class="at">diss =</span> <span class="fu">dist</span>(cX, <span class="at">method =</span> <span class="st">"euclidean"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -333,21 +333,20 @@ W = 0.83366, p-value &lt; 2.2e-16</code></pre>
 <p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Con el método de la silueta, nos sugiere escoger <span class="math inline">\(k=2\)</span>, en cambio, con el siguiente, nos sugiere <span class="math inline">\(8\)</span> clusters. Como no hemos salido de dudas, realicemos clusters para <span class="math inline">\(k =2,4,8\)</span></p>
+<p>Con el método de la silueta, nos sugiere escoger <span class="math inline">\(k=2\)</span>, en cambio, con el siguiente, nos sugiere <span class="math inline">\(8\)</span> clústers. Como no hemos salido de dudas, realicemos clústers para <span class="math inline">\(k =2,4,8\)</span></p>
 <ul>
-<li>2 clusters:</li>
+<li>2 clústers:</li>
 </ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">232</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>km_clusters_2 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(<span class="at">x =</span> cX, <span class="at">centers =</span> <span class="dv">2</span>, <span class="at">nstart =</span> <span class="dv">70</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># km_clusters$cluster</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>km_clusters_2 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(<span class="at">x =</span> cX, <span class="at">centers =</span> <span class="dv">2</span>, <span class="at">nstart =</span> <span class="dv">70</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Ahora bien, representemos dichos clusters en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2).</p>
+<p>Ahora bien, representemos dichos clústers en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(<span class="at">object =</span> km_clusters_2, <span class="at">data =</span> cX, <span class="at">show.clust.cent =</span> <span class="cn">TRUE</span>, <span class="at">geom =</span><span class="st">"point"</span>,</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a> <span class="at">ellipse.type =</span> <span class="st">"euclid"</span>, <span class="at">star.plot =</span> <span class="cn">TRUE</span>, <span class="at">repel =</span> <span class="cn">TRUE</span>, <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"#FF7078"</span>, <span class="st">"#A298E8"</span>)) <span class="sc">+</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"right"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -362,7 +361,7 @@ W = 0.83366, p-value &lt; 2.2e-16</code></pre>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(<span class="at">object =</span> km_clusters_4, <span class="at">data =</span> cX, <span class="at">show.clust.cent =</span> <span class="cn">TRUE</span>, <span class="at">geom =</span><span class="st">"point"</span>,</span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a> <span class="at">ellipse.type =</span> <span class="st">"euclid"</span>, <span class="at">star.plot =</span> <span class="cn">TRUE</span>, <span class="at">repel =</span> <span class="cn">TRUE</span>, <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"#FF7078"</span>, <span class="st">"#F39B4C"</span>, <span class="st">"#7FBFF5"</span>, <span class="st">"#A298E8"</span>)) <span class="sc">+</span></span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"right"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -377,14 +376,14 @@ W = 0.83366, p-value &lt; 2.2e-16</code></pre>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(<span class="at">object =</span> km_clusters_8, <span class="at">data =</span> cX, <span class="at">show.clust.cent =</span> <span class="cn">TRUE</span>, <span class="at">geom =</span><span class="st">"point"</span>,</span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a> <span class="at">ellipse.type =</span> <span class="st">"euclid"</span>, <span class="at">star.plot =</span> <span class="cn">TRUE</span>, <span class="at">repel =</span> <span class="cn">TRUE</span>, <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"#FF7078"</span>, <span class="st">"#FF7F00"</span>, <span class="st">"#7FBFF5"</span>, <span class="st">"#8B3A62"</span>,<span class="st">"#FFB90F"</span>, <span class="st">"#1C86EE"</span>,  <span class="st">"#FF3030"</span>, <span class="st">"#00CD00"</span>)) <span class="sc">+</span></span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"right"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Como podemos ver, al menos en la proyección en 2 dimensiones, hay bastante solapamiento. Además, si vemos la zona pintada como si fuera un intervalo de confianza, hay muchas observaciones que quedan fuera.</p>
-<p>Ahora bien, sería interesante ver si el caso de k = 4, los clusters corresponden a las fases de cirrosis segun la variable <code>stage</code>.</p>
-<p>Vamos a crear un data frame compuesto de 3 columnas: identificador del paciente, estado de la enfermedad y cluster al que pertenece.</p>
+<p>Como podemos ver, al menos en la proyección en <span class="math inline">\(2\)</span> dimensiones, hay bastante solapamiento. Además, si vemos la zona pintada como si fuera un intervalo de confianza, hay muchas observaciones que quedan fuera.</p>
+<p>Ahora bien, sería interesante ver si el caso de <span class="math inline">\(k = 4\)</span>, los clusters corresponden a las fases de cirrosis segun la variable <code>stage</code>.</p>
+<p>Vamos a crear un data frame compuesto de <span class="math inline">\(3\)</span> columnas: identificador del paciente, estado de la enfermedad y cluster al que pertenece.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>id_stage <span class="ot">=</span> datos <span class="sc">%&gt;%</span> </span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ID, Stage)</span>
@@ -406,7 +405,7 @@ Stage  1  2  3  4
 </section>
 <section id="k-medoids-pam" class="level2">
 <h2 class="anchored" data-anchor-id="k-medoids-pam">K-medoids (PAM)</h2>
-<p>En este caso, cada cluster está representado por una observación presente en el cluster (medoid), mientras que en K-means cada cluster está representado por su centroide, que se corresponde con el promedio de todas las observaciones del cluster pero con ninguna en particular. Vamos a utilizar la distancia de Manhattaan ya que es menos sensible a outliers.</p>
+<p>En este caso, cada cluster está representado por una observación presente en el cluster (medoid), mientras que en <em>K-means</em> cada cluster está representado por su centroide, que se corresponde con el promedio de todas las observaciones del cluster pero con ninguna en particular. Vamos a utilizar la distancia de Manhattaan ya que es menos sensible a outliers.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(<span class="at">x =</span> cX, <span class="at">FUNcluster =</span> pam, <span class="at">method =</span> <span class="st">"wss"</span>,</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a> <span class="at">diss =</span> <span class="fu">dist</span>(datos, <span class="at">method =</span> <span class="st">"manhattan"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -414,7 +413,7 @@ Stage  1  2  3  4
 <p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Encontramos codos en <span class="math inline">\(k=2\)</span>, <span class="math inline">\(k=4\)</span> y uno muy pronunciado en <span class="math inline">\(k=6\)</span>. Para ver cual sería óptimo, como en el caso anterior, visualicemos otros métodos como el de la silueta i gap_stat.</p>
+<p>Encontramos codos en <span class="math inline">\(k=2\)</span>, <span class="math inline">\(k=4\)</span> y uno muy pronunciado en <span class="math inline">\(k=6\)</span>. Para ver cual sería óptimo, como en el caso anterior, visualicemos otros métodos como el de la <em>silueta</em> y <em>gap_stat</em>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(<span class="at">x =</span> cX, <span class="at">FUNcluster =</span> pam, <span class="at">method =</span> <span class="st">"silhouette"</span>,</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a> <span class="at">diss =</span> <span class="fu">dist</span>(datos, <span class="at">method =</span> <span class="st">"manhattan"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -429,25 +428,25 @@ Stage  1  2  3  4
 <p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Estos dos métodos nos sugieren 2 clusters para realizar el análisis.</p>
+<p>Estos dos métodos nos sugieren <span class="math inline">\(2\)</span> clusters para realizar el análisis.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>pam_clusters <span class="ot">&lt;-</span> <span class="fu">pam</span>(<span class="at">x =</span> cX, <span class="at">k =</span> <span class="dv">2</span>, <span class="at">metric =</span> <span class="st">"manhattan"</span>)</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(<span class="at">object =</span> pam_clusters, <span class="at">data =</span> cX, <span class="at">ellipse.type =</span> <span class="st">"t"</span>, <span class="at">geom =</span> <span class="st">"point"</span>, <span class="at">repel =</span><span class="cn">TRUE</span>) <span class="sc">+</span></span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"right"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Estan bastante solapados, puede deberse a la proyección a dos dimensiones.</p>
-<p>Realicemos kmedoids con <span class="math inline">\(k=4\)</span> para comparar con la variable <code>stage</code>:</p>
+<p>Realicemos <em>k-medoids</em> con <span class="math inline">\(k=4\)</span> para comparar con la variable <code>stage</code>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>pam_clusters_4 <span class="ot">&lt;-</span> <span class="fu">pam</span>(<span class="at">x =</span> cX, <span class="at">k =</span> <span class="dv">4</span>, <span class="at">metric =</span> <span class="st">"manhattan"</span>)</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(<span class="at">object =</span> pam_clusters_4, <span class="at">data =</span> cX, <span class="at">ellipse.type =</span> <span class="st">"t"</span>, <span class="at">geom =</span> <span class="st">"point"</span>, <span class="at">repel =</span><span class="cn">TRUE</span>) <span class="sc">+</span></span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"right"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -470,10 +469,55 @@ Stage  1  2  3  4
     4 46 24 17  7</code></pre>
 </div>
 </div>
-<p>Observemos que en este caso un kmedoids con <span class="math inline">\(k=4\)</span> tampoco clusteriza en función del estado de cirrosis en que se encuentra el paciente.</p>
+<p>Observemos que en este caso un <em>k-medoids</em> con <span class="math inline">\(k=4\)</span> tampoco clusteriza en función del estado de cirrosis en que se encuentra el paciente.</p>
 </section>
 <section id="clara" class="level2">
 <h2 class="anchored" data-anchor-id="clara">Clara</h2>
+<p>Este método combina los dos anteriores. dividiendo a partes iguales el conjunto de observaciones y aplicando PAM a cada una de las partes para identificar los <em>medoids</em>. Calcular la suma total de las distancias entre cada observación y su correspondiente medoid y seleccionar como clustering final aquel que ha conseguido menor suma total de distancias intra-clusters.</p>
+<p>Como en los casos anteirores han salido que <span class="math inline">\(k=2, 4\)</span> eran los más óptimos, realicemos <em>Clara</em> con estos valores de <span class="math inline">\(k\)</span>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>clara_clusters_2 <span class="ot">&lt;-</span> <span class="fu">clara</span>(<span class="at">x =</span> cX, <span class="at">k =</span> <span class="dv">2</span>, <span class="at">metric =</span> <span class="st">"manhattan"</span>, <span class="at">stand =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a> <span class="at">samples =</span> <span class="dv">50</span>, <span class="at">pamLike =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(<span class="at">object =</span> clara_clusters_2, <span class="at">ellipse.type =</span> <span class="st">"t"</span>, <span class="at">geom =</span> <span class="st">"point"</span>) <span class="sc">+</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"right"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>clara_clusters_4 <span class="ot">&lt;-</span> <span class="fu">clara</span>(<span class="at">x =</span> cX, <span class="at">k =</span> <span class="dv">4</span>, <span class="at">metric =</span> <span class="st">"manhattan"</span>, <span class="at">stand =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a> <span class="at">samples =</span> <span class="dv">50</span>, <span class="at">pamLike =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(<span class="at">object =</span> clara_clusters_4, <span class="at">ellipse.type =</span> <span class="st">"t"</span>, <span class="at">geom =</span> <span class="st">"point"</span>) <span class="sc">+</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"right"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Observemos que los resultados son bastante parecidos que en <em>k-means</em> y <em>k-medoids</em>.</p>
+<p>Comprobemos si la clusterizacion en <span class="math inline">\(4\)</span> grupos es semejante a la de la variable <code>stage</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>id_stage <span class="ot">=</span> datos <span class="sc">%&gt;%</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ID, Stage)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>Cluster_clara <span class="ot">=</span> clara_clusters_4<span class="sc">$</span>clustering <span class="sc">%&gt;%</span> <span class="fu">as.factor</span>()</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>tabla_cluster <span class="ot">=</span> <span class="fu">cbind</span>(id_stage, Cluster_clara)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">x =</span> tabla_cluster[,<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Cluster_clara
+Stage  1  2  3  4
+    1  0  8  3  1
+    2  2 28 27  2
+    3  3 53 38 17
+    4 34 28 23  9</code></pre>
+</div>
+</div>
+<p>Observemos que el método <em>Clara</em> con <span class="math inline">\(k=4\)</span> tampoco clusteriza en función del estado de cirrosis en que se encuentra el paciente.</p>
 </section>
 <section id="dendograma" class="level2">
 <h2 class="anchored" data-anchor-id="dendograma">Dendograma</h2>
@@ -485,81 +529,81 @@ Stage  1  2  3  4
 <li><p><strong>Average:</strong> Se calcula la distancia entre todos los posibles pares formados por una observación del cluster A y una del cluster B. El valor promedio de todas ellas se selecciona como la distancia entre los dos clusters.</p></li>
 <li><p><strong>Centroid:</strong> Se calcula el centroide de cada uno de los clusters y se selecciona la distancia entre ellos como la distancia entre los dos clusters.</p></li>
 <li><p><strong>Ward:</strong> Se trata de un método general. La selección del par de clusters que se combinan en cada paso del <em>agglomerative hierarchical clustering</em> se basa en el valor óptimo de una función objetivo, pudiendo ser esta última cualquier función definida por el analista. Un caso particular es <em>Ward’s minimum variance</em>, en cada paso se identifican aquellos 2 clusters cuya fusión conlleva menor incremento de la varianza total intra-cluster.</p></li>
-<li><p>Dendograma para 4 clusters con distancia entre clusters <em>Complete or Maximum</em>:</p></li>
+<li><p>Dendograma para <span class="math inline">\(4\)</span> clusters con distancia entre clusters <em>Complete or Maximum</em>:</p></li>
 </ul>
-<div class="cell" data-hash="Entrega_Clustering_cache/html/unnamed-chunk-30_f9ea95ebc23b924ea991c662238b55e5">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>hc_completo <span class="ot">&lt;-</span> mat_dist <span class="sc">%&gt;%</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hclust</span>(<span class="at">method =</span> <span class="st">"complete"</span>) <span class="co"># Complete or Maximum</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_dend</span>(<span class="at">x =</span> hc_completo, <span class="at">k =</span> <span class="dv">4</span>, <span class="at">cex =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">11.2</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">9.6</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<ul>
-<li>Dendograma para 4 clusters con distancia entre clusters <em>Single or Minimum</em>:</li>
-</ul>
-<div class="cell" data-hash="Entrega_Clustering_cache/html/unnamed-chunk-31_06579b2231a7b9ebb532c8c842d11f9b">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>hc_single <span class="ot">&lt;-</span> mat_dist <span class="sc">%&gt;%</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hclust</span>(<span class="at">method =</span> <span class="st">"single"</span>) <span class="co"># Single or Minimum</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_dend</span>(<span class="at">x =</span> hc_single, <span class="at">k =</span> <span class="dv">4</span>, <span class="at">cex =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a> <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">5.9</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)<span class="sc">+</span></span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">5.1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<ul>
-<li>Dendograma para 4 clusters con distancia entre clusters <em>Average</em>:</li>
-</ul>
-<div class="cell" data-hash="Entrega_Clustering_cache/html/unnamed-chunk-32_7802d7f6a5951389e6d261ca9415895a">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>hc_average <span class="ot">&lt;-</span> mat_dist <span class="sc">%&gt;%</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hclust</span>(<span class="at">method =</span> <span class="st">"average"</span>) <span class="co"># Average</span></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_dend</span>(<span class="at">x =</span> hc_average, <span class="at">k =</span> <span class="dv">4</span>, <span class="at">cex =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a> <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">8.8</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)<span class="sc">+</span></span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">7</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<ul>
-<li>Dendograma para 4 clusters con distancia entre clusters <em>Ward’s minimum variance</em>:</li>
-</ul>
-<div class="cell" data-hash="Entrega_Clustering_cache/html/unnamed-chunk-33_5256e4f476d72b9a929587dbba4ca606">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>hc_ward_D2 <span class="ot">&lt;-</span> mat_dist <span class="sc">%&gt;%</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hclust</span>(<span class="at">method =</span> <span class="st">"ward.D2"</span>) <span class="co"># Ward's minimum variance</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_dend</span>(<span class="at">x =</span> hc_ward_D2, <span class="at">k =</span> <span class="dv">4</span>, <span class="at">cex =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a> <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">25</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)<span class="sc">+</span></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">18</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Entrega_Clustering_cache/html/unnamed-chunk-33_d8c741be4dcb17b2187361e1c8db059b">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>hc_completo <span class="ot">&lt;-</span> mat_dist <span class="sc">%&gt;%</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hclust</span>(<span class="at">method =</span> <span class="st">"complete"</span>) <span class="co"># Complete or Maximum</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_dend</span>(<span class="at">x =</span> hc_completo, <span class="at">k =</span> <span class="dv">4</span>, <span class="at">cex =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">11.2</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">9.6</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <ul>
+<li>Dendograma para <span class="math inline">\(4\)</span> clusters con distancia entre clusters <em>Single or Minimum</em>:</li>
+</ul>
+<div class="cell" data-hash="Entrega_Clustering_cache/html/unnamed-chunk-34_2a747b8bf6a104fc5d4d11b42e0b328d">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>hc_single <span class="ot">&lt;-</span> mat_dist <span class="sc">%&gt;%</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hclust</span>(<span class="at">method =</span> <span class="st">"single"</span>) <span class="co"># Single or Minimum</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_dend</span>(<span class="at">x =</span> hc_single, <span class="at">k =</span> <span class="dv">4</span>, <span class="at">cex =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a> <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">5.9</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)<span class="sc">+</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">5.1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ul>
+<li>Dendograma para <span class="math inline">\(4\)</span> clusters con distancia entre clusters <em>Average</em>:</li>
+</ul>
+<div class="cell" data-hash="Entrega_Clustering_cache/html/unnamed-chunk-35_2a80d578dbbdead3fe41a9077d577b9e">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>hc_average <span class="ot">&lt;-</span> mat_dist <span class="sc">%&gt;%</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hclust</span>(<span class="at">method =</span> <span class="st">"average"</span>) <span class="co"># Average</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_dend</span>(<span class="at">x =</span> hc_average, <span class="at">k =</span> <span class="dv">4</span>, <span class="at">cex =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a> <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">8.8</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)<span class="sc">+</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">7</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ul>
+<li>Dendograma para <span class="math inline">\(4\)</span> clusters con distancia entre clusters <em>Ward’s minimum variance</em>:</li>
+</ul>
+<div class="cell" data-hash="Entrega_Clustering_cache/html/unnamed-chunk-36_d107d2737983006665343676d2846235">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>hc_ward_D2 <span class="ot">&lt;-</span> mat_dist <span class="sc">%&gt;%</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hclust</span>(<span class="at">method =</span> <span class="st">"ward.D2"</span>) <span class="co"># Ward's minimum variance</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_dend</span>(<span class="at">x =</span> hc_ward_D2, <span class="at">k =</span> <span class="dv">4</span>, <span class="at">cex =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a> <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">25</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)<span class="sc">+</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">18</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ul>
 <li><p>Observemos que al tener muchas observaciones no podemos distinguirlas. Aun así nos podemos hacer una idea del tamaño de cada cluster.</p></li>
 <li><p>Observamos que en nuestros datos los clusters que se forman dependen mucho de la distancia entre clusters que se escoja. Esto puede indicar que los datos no esten distribuidos en grupos bien diferenciados.</p></li>
-<li><p>Observamos que si cortamos más arriba el dendograma (la línea más alta), podemos ver cuales son los clusters que se juntan si quisiéramos solo 2 clusters.</p></li>
+<li><p>Observamos que si cortamos más arriba el dendograma (la línea más alta), podemos ver cuales son los clusters que se juntan si quisiéramos solo <span class="math inline">\(2\)</span> clusters.</p></li>
 </ul>
 <p>Una vez calculados los dendogramas, hay que comprobar que la estructura preserva bien las distancias originales entre las observaciones. Para hacerlo usemos el coeficiente de correlación entre las distancias <em>cophenetic</em> del dendrograma y la matriz de distancias original. Cuanto más cercano a 1 sea el valor, mejor refleja el dendograma las distancias originales.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_completo))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_completo))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.6545671</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_single))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_single))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.8451853</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_average))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_average))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.8300136</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_ward_D2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(<span class="at">x =</span> mat_dist, <span class="fu">cophenetic</span>(hc_ward_D2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.5109195</code></pre>
 </div>
@@ -571,9 +615,9 @@ Stage  1  2  3  4
 </section>
 <section id="análisis-de-componentes-principales" class="level1">
 <h1>Análisis de Componentes Principales</h1>
-<p>Calculamos las componentes principales con el comando <code>prcomp</code> utilizando nuestro dataset, sin escalar los datos ya que están todos en la misma escala. Por último, los consideramos centrados en el 0.</p>
+<p>Calculamos las componentes principales con el comando <code>prcomp</code> utilizando nuestro dataset, escalando los datos y centrados.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>datos.acp<span class="ot">=</span><span class="fu">prcomp</span>(datos_quant, <span class="at">scale =</span> <span class="cn">TRUE</span>, <span class="at">center =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>datos.acp<span class="ot">=</span><span class="fu">prcomp</span>(datos_quant, <span class="at">scale =</span> <span class="cn">TRUE</span>, <span class="at">center =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Los valores propios muestran el porcentaje de varianza explicada por cada componente principal.</p>
 <div class="cell">
@@ -594,23 +638,23 @@ Dim.11    0.32946          2.99511                   100.00000</code></pre>
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid" width="672"></p>
+<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Efectivamente, viendo el gráfico y utilizando el criterio del codo, nos quedaremos con</p>
+<p>Efectivamente, viendo el gráfico y utilizando el criterio del codo, nos quedaremos con <span class="math inline">\(2\)</span> componentes principales.</p>
 <p>Realicemos un gráfico de círculo de correlación variable para ver como se agrupan las variables y la calidad de representación que tienen.</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid" width="672"></p>
+<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Para corroborar numéricamente la calidad de representación, realizaremos un gráfico de cos2.</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid" width="672"></p>
+<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Efectivamente, las tres primeras variables tienen un cos2 alto, por tanto estas bien representadas. En cambio, las otras variables tienen un valor de cos2 prácticamente nulo, indica que estas variables no estan bien representadas por las componentes principales.</p>
+<p>Efectivamente, las dos primeras variables tienen un cos2 alto, por tanto estas bien representadas. En cambio, las otras variables tienen un valor de cos2 más bajo, indicando que estas variables no están tan bien representadas por las componentes principales.</p>
 <p>Para ver como se relacionan las componentes principales con los datos originales, veamos los autovectores.</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -645,7 +689,7 @@ Prothrombin    0.1044 -0.0015  0.3104</code></pre>
 <p>Ahora, vamos a realizar un <code>biplot</code>, que nos permitirá visualizar las variables originales y las observaciones transformadas en los ejes de componentes principales.</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid" width="672"></p>
+<p><img src="Entrega_Clustering_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <section id="resultados-del-análisis" class="level3">

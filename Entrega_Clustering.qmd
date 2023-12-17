@@ -181,7 +181,7 @@ fviz_dist(dist.obj = mat_dist, lab_size = 5) +
 
 ## K-means
 
-En nuestro caso, no sabemos en cuantos clusters o grupos esta dividido nuestro dataset. Por tanto, vamos a estimar al número $k$ óptimo para aplicar el método de `kmeans()`. Para ello, utilizaremos la función `fviz_nbclust()`:
+En nuestro caso, no sabemos en cuantos clusters o grupos esta dividido nuestro dataset. Por tanto, vamos a estimar al número $k$ óptimo para aplicar el método de *k-means*. Para ello, utilizaremos la función `fviz_nbclust()`:
 
 ```{r}
 fviz_nbclust(x = cX, FUNcluster = kmeans, method = "wss",
@@ -200,7 +200,7 @@ fviz_nbclust(x = cX, FUNcluster = kmeans, method = "gap_stat",
  diss = dist(cX, method = "euclidean"))
 ```
 
-Con el método de la silueta, nos sugiere escoger $k=2$, en cambio, con el siguiente, nos sugiere $8$ clusters. Como no hemos salido de dudas, realicemos clusters para $k =2,4,8$ 
+Con el método de la silueta, nos sugiere escoger $k=2$, en cambio, con el siguiente, nos sugiere $8$ clústers. Como no hemos salido de dudas, realicemos clústers para $k =2,4,8$ 
 
 
 
@@ -323,21 +323,20 @@ fviz_nbclust(resnumclust)
 # Vamos a calcular las 4 k-medias con nuestros datos y con 30 iteraciones. Además, vamos a visualizar como ha quedado la partición.
 ```
 
-- 2 clusters:
+- 2 clústers:
 
 ```{r}
 set.seed(232)
 km_clusters_2 <- kmeans(x = cX, centers = 2, nstart = 70)
-# km_clusters$cluster
 ```
 
-Ahora bien, representemos dichos clusters en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2).
+Ahora bien, representemos dichos clústers en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2).
 
 ```{r}
 fviz_cluster(object = km_clusters_2, data = cX, show.clust.cent = TRUE, geom ="point",
  ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, palette = c("#FF7078", "#A298E8")) +
 theme_bw() +
-theme(legend.position = "none")
+theme(legend.position = "right")
 ```
 
 - 4 clusters:
@@ -350,7 +349,7 @@ km_clusters_4 <- kmeans(x = cX, centers = 4, nstart = 70)
 fviz_cluster(object = km_clusters_4, data = cX, show.clust.cent = TRUE, geom ="point",
  ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, palette = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8")) +
 theme_bw() +
-theme(legend.position = "none")
+theme(legend.position = "right")
 ```
 
 - 8 clusters:
@@ -363,16 +362,16 @@ km_clusters_8 <- kmeans(x = cX, centers = 8, nstart = 70)
 fviz_cluster(object = km_clusters_8, data = cX, show.clust.cent = TRUE, geom ="point",
  ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, palette = c("#FF7078", "#FF7F00", "#7FBFF5", "#8B3A62","#FFB90F", "#1C86EE",  "#FF3030", "#00CD00")) +
 theme_bw() +
-theme(legend.position = "none")
+theme(legend.position = "right")
 ```
 
 
-Como podemos ver, al menos en la proyección en 2 dimensiones, hay bastante solapamiento. Además, si vemos la zona pintada como si fuera un intervalo de confianza, hay muchas observaciones que quedan fuera.
+Como podemos ver, al menos en la proyección en $2$ dimensiones, hay bastante solapamiento. Además, si vemos la zona pintada como si fuera un intervalo de confianza, hay muchas observaciones que quedan fuera.
 
 
-Ahora bien, sería interesante ver si el caso de k = 4, los clusters corresponden a las fases de cirrosis segun la variable `stage`.
+Ahora bien, sería interesante ver si el caso de $k = 4$, los clusters corresponden a las fases de cirrosis segun la variable `stage`.
 
-Vamos a crear un data frame compuesto de 3 columnas: identificador del paciente, estado de la enfermedad y cluster al que pertenece.
+Vamos a crear un data frame compuesto de $3$ columnas: identificador del paciente, estado de la enfermedad y cluster al que pertenece.
 
 ```{r}
 id_stage = datos %>% 
@@ -388,14 +387,14 @@ Observemos que en este caso un kmeans con $k=4$ no clusteriza en función del es
 
 ## K-medoids (PAM)
 
-En este caso, cada cluster está representado por una observación presente en el cluster (medoid), mientras que en K-means cada cluster está representado por su centroide, que se corresponde con el promedio de todas las observaciones del cluster pero con ninguna en particular. Vamos a utilizar la distancia de Manhattaan ya que es menos sensible a outliers.
+En este caso, cada cluster está representado por una observación presente en el cluster (medoid), mientras que en *K-means* cada cluster está representado por su centroide, que se corresponde con el promedio de todas las observaciones del cluster pero con ninguna en particular. Vamos a utilizar la distancia de Manhattaan ya que es menos sensible a outliers.
 
 ```{r, warning=FALSE}
 fviz_nbclust(x = cX, FUNcluster = pam, method = "wss",
  diss = dist(datos, method = "manhattan"))
 ```
 
-Encontramos codos en $k=2$, $k=4$ y uno muy pronunciado en $k=6$. Para ver cual sería óptimo, como en el caso anterior, visualicemos otros métodos como el de la silueta i gap_stat.
+Encontramos codos en $k=2$, $k=4$ y uno muy pronunciado en $k=6$. Para ver cual sería óptimo, como en el caso anterior, visualicemos otros métodos como el de la *silueta* y *gap_stat*.
 
 ```{r, warning=FALSE}
 fviz_nbclust(x = cX, FUNcluster = pam, method = "silhouette",
@@ -407,7 +406,7 @@ fviz_nbclust(x = cX, FUNcluster = pam, method = "gap_stat",
  diss = dist(datos, method = "manhattan"))
 ```
 
-Estos dos métodos nos sugieren 2 clusters para realizar el análisis.
+Estos dos métodos nos sugieren $2$ clusters para realizar el análisis.
 
 
 ```{r, cache=TRUE,, eval=FALSE, echo=FALSE}
@@ -429,19 +428,19 @@ pam_clusters <- pam(x = cX, k = 2, metric = "manhattan")
 
 fviz_cluster(object = pam_clusters, data = cX, ellipse.type = "t", geom = "point", repel =TRUE) +
   theme_bw() + 
-  theme(legend.position = "none")
+  theme(legend.position = "right")
 ```
 
 Estan bastante solapados, puede deberse a la proyección a dos dimensiones.
 
-Realicemos kmedoids con $k=4$ para comparar con la variable `stage`:
+Realicemos *k-medoids* con $k=4$ para comparar con la variable `stage`:
 
 ```{r}
 pam_clusters_4 <- pam(x = cX, k = 4, metric = "manhattan")
 
 fviz_cluster(object = pam_clusters_4, data = cX, ellipse.type = "t", geom = "point", repel =TRUE) +
   theme_bw() + 
-  theme(legend.position = "none")
+  theme(legend.position = "right")
 ```
 ```{r}
 id_stage = datos %>% 
@@ -454,11 +453,48 @@ tabla_cluster = cbind(id_stage, Cluster_medoid)
 table(x = tabla_cluster[,c(2,3)])
 ```
 
-Observemos que en este caso un kmedoids con $k=4$ tampoco clusteriza en función del estado de cirrosis en que se encuentra el paciente.
+Observemos que en este caso un *k-medoids* con $k=4$ tampoco clusteriza en función del estado de cirrosis en que se encuentra el paciente.
 
 ## Clara
 
+Este método combina los dos anteriores. dividiendo a partes iguales el conjunto de observaciones y aplicando PAM a cada una de las partes para identificar los *medoids*. Calcular la suma total de las distancias entre cada observación y su correspondiente medoid y seleccionar como clustering final aquel que ha conseguido menor suma total de distancias intra-clusters. 
 
+Como en los casos anteirores han salido que $k=2, 4$ eran los más óptimos, realicemos *Clara* con estos valores de $k$:
+
+```{r}
+clara_clusters_2 <- clara(x = cX, k = 2, metric = "manhattan", stand = TRUE,
+ samples = 50, pamLike = TRUE)
+
+fviz_cluster(object = clara_clusters_2, ellipse.type = "t", geom = "point") +
+theme_bw() +
+theme(legend.position = "right")
+```
+
+```{r}
+clara_clusters_4 <- clara(x = cX, k = 4, metric = "manhattan", stand = TRUE,
+ samples = 50, pamLike = TRUE)
+
+fviz_cluster(object = clara_clusters_4, ellipse.type = "t", geom = "point") +
+theme_bw() +
+theme(legend.position = "right")
+
+```
+
+Observemos que los resultados son bastante parecidos que en *k-means* y *k-medoids*. 
+
+Comprobemos si la clusterizacion en $4$ grupos es semejante a la de la variable `stage`
+
+```{r}
+id_stage = datos %>% 
+  select(ID, Stage)
+
+Cluster_clara = clara_clusters_4$clustering %>% as.factor()
+
+tabla_cluster = cbind(id_stage, Cluster_clara)
+
+table(x = tabla_cluster[,c(2,3)])
+```
+Observemos que el método *Clara* con $k=4$ tampoco clusteriza en función del estado de cirrosis en que se encuentra el paciente.
 
 ## Dendograma
 
@@ -477,7 +513,7 @@ Como sabemos, existen diferentes tipos de dendogramas en función del tipo de di
 - **Ward:** Se trata de un método general. La selección del par de clusters que se combinan en cada paso del *agglomerative hierarchical clustering* se basa en el valor óptimo de una función objetivo, pudiendo ser esta última cualquier función definida por el analista. Un caso particular es *Ward's minimum variance*, en cada paso se identifican aquellos 2 clusters cuya fusión conlleva menor incremento de la varianza total intra-cluster.
 
 
-- Dendograma para 4 clusters con distancia entre clusters *Complete or Maximum*:
+- Dendograma para $4$ clusters con distancia entre clusters *Complete or Maximum*:
 
 ```{r, cache=TRUE, warning=FALSE}
 hc_completo <- mat_dist %>%
@@ -488,7 +524,7 @@ fviz_dend(x = hc_completo, k = 4, cex = 0.6) +
   geom_hline(yintercept = 9.6, linetype = "dashed")
 ```
 
-- Dendograma para 4 clusters con distancia entre clusters *Single or Minimum*:
+- Dendograma para $4$ clusters con distancia entre clusters *Single or Minimum*:
 
 
 ```{r, cache=TRUE, warning=FALSE}
@@ -500,7 +536,7 @@ fviz_dend(x = hc_single, k = 4, cex = 0.6) +
   geom_hline(yintercept = 5.1, linetype = "dashed")
 ```
 
-- Dendograma para 4 clusters con distancia entre clusters *Average*:
+- Dendograma para $4$ clusters con distancia entre clusters *Average*:
 
 ```{r, cache=TRUE, warning=FALSE}
 hc_average <- mat_dist %>%
@@ -511,7 +547,7 @@ fviz_dend(x = hc_average, k = 4, cex = 0.6) +
   geom_hline(yintercept = 7, linetype = "dashed")
 ```
 
-- Dendograma para 4 clusters con distancia entre clusters *Ward's minimum variance*:
+- Dendograma para $4$ clusters con distancia entre clusters *Ward's minimum variance*:
 
 ```{r, cache=TRUE, warning=FALSE}
 hc_ward_D2 <- mat_dist %>%
@@ -526,7 +562,7 @@ fviz_dend(x = hc_ward_D2, k = 4, cex = 0.6) +
 
 - Observamos que en nuestros datos los clusters que se forman dependen mucho de la distancia entre clusters que se escoja. Esto puede indicar que los datos no esten distribuidos en grupos bien diferenciados.
 
-- Observamos que si cortamos más arriba el dendograma (la línea más alta), podemos ver cuales son los clusters que se juntan si quisiéramos solo 2 clusters.
+- Observamos que si cortamos más arriba el dendograma (la línea más alta), podemos ver cuales son los clusters que se juntan si quisiéramos solo $2$ clusters.
 
 
 Una vez calculados los dendogramas, hay que comprobar que la estructura preserva bien las distancias originales entre las observaciones. Para hacerlo usemos el coeficiente de correlación entre las distancias *cophenetic* del dendrograma y la matriz de distancias original. Cuanto más cercano a 1 sea el valor, mejor refleja el dendograma las distancias originales.
@@ -544,7 +580,7 @@ cor(x = mat_dist, cophenetic(hc_ward_D2))
 
 # Análisis de Componentes Principales
 
-Calculamos las componentes principales con el comando `prcomp` utilizando nuestro dataset, sin escalar los datos ya que están todos en la misma escala. Por último, los consideramos centrados en el 0.
+Calculamos las componentes principales con el comando `prcomp` utilizando nuestro dataset, escalando los datos y centrados.
 
 ```{r}
 datos.acp=prcomp(datos_quant, scale = TRUE, center = TRUE)
@@ -561,7 +597,7 @@ round(lambdas, 5)
 fviz_eig(datos.acp, addlabels = TRUE, ylim=c(0,100))
 ```
 
-Efectivamente, viendo el gráfico y utilizando el criterio del codo, nos quedaremos con
+Efectivamente, viendo el gráfico y utilizando el criterio del codo, nos quedaremos con $2$ componentes principales.
 
 Realicemos un gráfico de círculo de correlación variable para ver como se agrupan las variables y la calidad de representación que tienen.
 
@@ -578,7 +614,7 @@ var <- get_pca_var(datos.acp)
 fviz_cos2(datos.acp, choice = "var", axes = 1:2)
 ```
 
-Efectivamente, las tres primeras variables tienen un cos2 alto, por tanto estas bien representadas. En cambio, las otras variables tienen un valor de cos2 prácticamente nulo, indica que estas variables no estan bien representadas por las componentes principales.
+Efectivamente, las dos primeras variables tienen un cos2 alto, por tanto estas bien representadas. En cambio, las otras variables tienen un valor de cos2 más bajo, indicando que estas variables no están tan bien representadas por las componentes principales.
 
 Para ver como se relacionan las componentes principales con los datos originales, veamos los autovectores.
 
