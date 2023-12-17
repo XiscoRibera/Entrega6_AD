@@ -159,9 +159,7 @@ Vamos a guardar en un nuevo dataset las variables cuantitativas. Vamos a tipific
 datos2 <- datos_quant %>% scale()
 ```
 
-A continuación, realicemos una representación gráfica de matrices de distancia:
-
-Primero de todo vamos a centrar la matriz de datos:
+A continuación, vamos a centrar los datos:
 
 ```{r}
 n <- dim(datos2)[1]
@@ -169,6 +167,9 @@ X <- as.matrix(datos2)
 Hn <- diag(n)-1/n # matriz de centrado
 cX <- Hn%*%X # matriz centrada
 ```
+
+
+Vamos a representar la matriz de distancia, utilizando distancia euclidea.
 
 ```{r}
 mat_dist <- dist(x = cX, method = "euclidean")
@@ -188,147 +189,31 @@ fviz_nbclust(x = cX, FUNcluster = kmeans, method = "wss",
  diss = dist(cX, method = "euclidean"))+
   geom_vline(xintercept = 4, linetype = 2)
 ```
+El método del codo nos sugiere considerar 4 clusters, aunque no sea demasiado clara la decisión. De todas formas, otro motivo para considerar 4 es para poder comparar con la variable `Stage` que tiene 4 niveles.
 
-
-```{r, cache=TRUE, eval=FALSE, echo=FALSE}
-# vamos a realizar otro experimento: vamos a realizar una función que nos proporciona 30 índices para determinar el número de clusters.
-resnumclust = NbClust(data = cX, distance = "euclidean", min.nc = 2, max.nc = 10, 
-                      method = "kmeans", index = "alllong")
-
-# fix the functions
-fviz_nbclust <- function (x, FUNcluster = NULL, method = c("silhouette", "wss", 
-                                           "gap_stat"), diss = NULL, k.max = 10, nboot = 100, verbose = interactive(), 
-          barfill = "steelblue", barcolor = "steelblue", linecolor = "steelblue", 
-          print.summary = TRUE, ...) 
-{
-  set.seed(123)
-  if (k.max < 2) 
-    stop("k.max must bet > = 2")
-  method = match.arg(method)
-  if (!inherits(x, c("data.frame", "matrix")) & !("Best.nc" %in% 
-                                                  names(x))) 
-    stop("x should be an object of class matrix/data.frame or ", 
-         "an object created by the function NbClust() [NbClust package].")
-  if (inherits(x, "list") & "Best.nc" %in% names(x)) {
-    best_nc <- x$Best.nc
-    if (any(class(best_nc) == "numeric") ) 
-      print(best_nc)
-    else if (any(class(best_nc) == "matrix") )
-      .viz_NbClust(x, print.summary, barfill, barcolor)
-  }
-  else if (is.null(FUNcluster)) 
-    stop("The argument FUNcluster is required. ", "Possible values are kmeans, pam, hcut, clara, ...")
-  else if (!is.function(FUNcluster)) {
-    stop("The argument FUNcluster should be a function. ", 
-         "Check if you're not overriding the specified function name somewhere.")
-  }
-  else if (method %in% c("silhouette", "wss")) {
-    if (is.data.frame(x)) 
-      x <- as.matrix(x)
-    if (is.null(diss)) 
-      diss <- stats::dist(x)
-    v <- rep(0, k.max)
-    if (method == "silhouette") {
-      for (i in 2:k.max) {
-        clust <- FUNcluster(x, i, ...)
-        v[i] <- .get_ave_sil_width(diss, clust$cluster)
-      }
-    }
-    else if (method == "wss") {
-      for (i in 1:k.max) {
-        clust <- FUNcluster(x, i, ...)
-        v[i] <- .get_withinSS(diss, clust$cluster)
-      }
-    }
-    df <- data.frame(clusters = as.factor(1:k.max), y = v, 
-                     stringsAsFactors = TRUE)
-    ylab <- "Total Within Sum of Square"
-    if (method == "silhouette") 
-      ylab <- "Average silhouette width"
-    p <- ggpubr::ggline(df, x = "clusters", y = "y", group = 1, 
-                        color = linecolor, ylab = ylab, xlab = "Number of clusters k", 
-                        main = "Optimal number of clusters")
-    if (method == "silhouette") 
-      p <- p + geom_vline(xintercept = which.max(v), linetype = 2, 
-                          color = linecolor)
-    return(p)
-  }
-  else if (method == "gap_stat") {
-    extra_args <- list(...)
-    gap_stat <- cluster::clusGap(x, FUNcluster, K.max = k.max, 
-                                 B = nboot, verbose = verbose, ...)
-    if (!is.null(extra_args$maxSE)) 
-      maxSE <- extra_args$maxSE
-    else maxSE <- list(method = "firstSEmax", SE.factor = 1)
-    p <- fviz_gap_stat(gap_stat, linecolor = linecolor, 
-                       maxSE = maxSE)
-    return(p)
-  }
-}
-
-.viz_NbClust <- function (x, print.summary = TRUE, barfill = "steelblue", 
-          barcolor = "steelblue") 
-{
-  best_nc <- x$Best.nc
-  if (any(class(best_nc) == "numeric") )
-    print(best_nc)
-  else if (any(class(best_nc) == "matrix") ) {
-    best_nc <- as.data.frame(t(best_nc), stringsAsFactors = TRUE)
-    best_nc$Number_clusters <- as.factor(best_nc$Number_clusters)
-    if (print.summary) {
-      ss <- summary(best_nc$Number_clusters)
-      cat("* Among all indices: \n===================\n")
-      for (i in 1:length(ss)) {
-        cat("*", ss[i], "proposed ", names(ss)[i], 
-            "as the best number of clusters\n")
-      }
-      cat("\n \t *****Conclusion*****\n\n")
-      cat("* According to the majority rule, the best number of clusters is ", 
-          names(which.max(ss)), ".\n\n")
-    }
-    df <- data.frame(Number_clusters = names(ss), freq = ss, 
-                     stringsAsFactors = TRUE)
-    p <- ggpubr::ggbarplot(df, x = "Number_clusters", 
-                           y = "freq", fill = barfill, color = barcolor) + 
-      labs(x = "Number of clusters k", y = "Frequency among all indices", 
-           title = paste0("Optimal number of clusters - k = ", 
-                          names(which.max(ss))))
-    return(p)
-  }
-}
-# assign them to the factoextra namespace
-environment(fviz_nbclust) <- asNamespace("factoextra")
-assignInNamespace("fviz_nbclust",fviz_nbclust,"factoextra")
-environment(.viz_NbClust) <- asNamespace("factoextra")
-assignInNamespace(".viz_NbClust",.viz_NbClust,"factoextra")
-
-
-
-fviz_nbclust(resnumclust)
-
-# Vamos a calcular las 4 k-medias con nuestros datos y con 30 iteraciones. Además, vamos a visualizar como ha quedado la partición.
-```
-
-
-
+Calculamos dichos clusters:
 
 ```{r}
 set.seed(232)
 km_clusters_4 <- kmeans(x = cX, centers = 4, nstart = 70)
+```
 
+
+Ahora bien, representemos dichos clústers en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2).
+
+```{r}
 fviz_cluster(object = km_clusters_4, data = cX, show.clust.cent = TRUE, geom ="point",
  ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, palette = c("#FF7078", "#F39B4C", "#7FBFF5", "#A298E8")) +
 theme_bw() +
 theme(legend.position = "right")
 ```
-Ahora bien, representemos dichos clústers en el plano. Como nuestro número de variables (dimensionalidad) es mayor de 2, automáticamente realiza un PCA y representa las dos primeras componentes principales (Dim1 y Dim2).
 
 Como podemos ver, al menos en la proyección en $2$ dimensiones, hay bastante solapamiento. Además, si vemos la zona pintada como si fuera un intervalo de confianza, hay muchas observaciones que quedan fuera.
 
 
-Ahora bien, sería interesante ver si los clusters corresponden a las fases de cirrosis segun la variable `stage`.
+En este punto, sería interesante ver si los clusters corresponden a las fases de cirrosis segun la variable `stage`.
 
-Vamos a crear un data frame compuesto de $3$ columnas: identificador del paciente, estado de la enfermedad y cluster al que pertenece.
+Vamos a crear un data frame compuesto de $3$ columnas: identificador del paciente, estado de la enfermedad y cluster al que pertenece, y observemos una tabla de frecuencias absolutas de cada fase de enfermedad y cada cluster:
 
 ```{r}
 id_stage = datos %>% 
@@ -340,7 +225,7 @@ tabla_cluster = cbind(id_stage, Cluster)
 table(x = tabla_cluster[,c(2,3)])
 ```
 
-Observemos que en este caso un kmeans con $k=4$ no clusteriza en función del estado de cirrosis en que se encuentra el paciente.
+Observemos que, en este caso, un kmeans con $k=4$ no clusteriza en función del estado de cirrosis en que se encuentra el paciente.
 
 ## K-medoids (PAM)
 
@@ -363,22 +248,7 @@ fviz_nbclust(x = cX, FUNcluster = pam, method = "gap_stat",
  diss = dist(datos, method = "manhattan"))
 ```
 
-Estos dos métodos nos sugieren $2$ clusters para realizar el análisis.
-
-
-```{r, cache=TRUE,, eval=FALSE, echo=FALSE}
-# Como en `kmeans`, podemos utilizar la misma función para corroborarlo con 30 índices, utilizando el método `median`, que es el más indicado para medoides:
-
-resnumclust2 = NbClust(data = cX, distance = "euclidean", min.nc = 2, max.nc = 10, 
-                      method = "median", index = "alllong")
-```
-
-```{r, cache=TRUE, eval=FALSE, echo=FALSE}
-fviz_nbclust(resnumclust2)
-
-# Esta función nos sugiere escoger 2 clusters. De este modo, calculamos los clusters y los representamos
-```
-
+Estos dos métodos nos sugieren $2$ clusters para realizar el análisis. En nuestro contexto, tiene más sentido utilizar 2, así que calculamos los medoides:
 
 ```{r}
 pam_clusters <- pam(x = cX, k = 2, metric = "manhattan")
@@ -410,13 +280,14 @@ tabla_cluster = cbind(id_stage, Cluster_medoid)
 table(x = tabla_cluster[,c(2,3)])
 ```
 
-Observemos que en este caso un *k-medoids* con $k=4$ tampoco clusteriza en función del estado de cirrosis en que se encuentra el paciente.
+Observemos que, en este caso, un *k-medoids* con $k=4$ tampoco clusteriza en función del estado de cirrosis en que se encuentra el paciente.
+
 
 ## Clara
 
-Este método combina los dos anteriores. dividiendo a partes iguales el conjunto de observaciones y aplicando PAM a cada una de las partes para identificar los *medoids*. Calcular la suma total de las distancias entre cada observación y su correspondiente medoid y seleccionar como clustering final aquel que ha conseguido menor suma total de distancias intra-clusters. 
+Este método combina los dos anteriores. dividiendo a partes iguales el conjunto de observaciones y aplicando PAM a cada una de las partes para identificar los *medoids*. Calcula la suma total de las distancias entre cada observación y su correspondiente medoid y seleccionaa como clustering final aquel que ha conseguido menor suma total de distancias intra-clusters. 
 
-Como en los casos anteirores han salido que $k=2, 4$ eran los más óptimos, realicemos *Clara* con estos valores de $k$:
+Como en los casos anteirores han salido que $k=2, 4$ eran los óptimos, realicemos *Clara* con estos valores de $k$:
 
 ```{r}
 clara_clusters_2 <- clara(x = cX, k = 2, metric = "manhattan", stand = TRUE,
@@ -439,7 +310,7 @@ theme(legend.position = "right")
 
 Observemos que los resultados son bastante parecidos que en *k-means* y *k-medoids*. 
 
-Comprobemos si la clusterizacion en $4$ grupos es semejante a la de la variable `stage`
+Comprobemos si la clusterización en $4$ grupos es semejante a la de la variable `stage`
 
 ```{r}
 id_stage = datos %>% 
@@ -451,7 +322,8 @@ tabla_cluster = cbind(id_stage, Cluster_clara)
 
 table(x = tabla_cluster[,c(2,3)])
 ```
-Observemos que el método *Clara* con $k=4$ tampoco clusteriza en función del estado de cirrosis en que se encuentra el paciente.
+Observemos que el método *Clara* con $k=4$ tampoco clusteriza en función de la fase de cirrosis en que se encuentra el paciente.
+
 
 ## Dendograma
 
@@ -515,9 +387,9 @@ fviz_dend(x = hc_ward_D2, k = 4, cex = 0.6) +
   geom_hline(yintercept = 18, linetype = "dashed")
 ```
 
-- Observemos que al tener muchas observaciones no podemos distinguirlas. Aun así nos podemos hacer una idea del tamaño de cada cluster. 
+- Observemos que, al tener muchas observaciones, no podemos distinguirlas. Aun así nos podemos hacer una idea del tamaño de cada cluster. 
 
-- Observamos que en nuestros datos los clusters que se forman dependen mucho de la distancia entre clusters que se escoja. Esto puede indicar que los datos no esten distribuidos en grupos bien diferenciados.
+- Observamos que, en nuestros datos, los clusters que se forman dependen mucho de la distancia entre clusters que se escoja. Esto puede indicar que los datos no esten distribuidos en grupos bien diferenciados.
 
 - Observamos que si cortamos más arriba el dendograma (la línea más alta), podemos ver cuales son los clusters que se juntan si quisiéramos solo $2$ clusters.
 
@@ -532,7 +404,7 @@ cor(x = mat_dist, cophenetic(hc_average))
 cor(x = mat_dist, cophenetic(hc_ward_D2))
 ```
 
-- Observamos que las distancias *Single or Minimum* y *Average* preservan mejor las distancias entre observaciones, en cambio *Ward's minimum variance* en nustro caso no es recomendable usarla.
+- Observamos que las distancias *Single or Minimum* y *Average* preservan mejor las distancias entre observaciones, en cambio *Ward's minimum variance* en nuestro caso no es recomendable usarla.
 
 
 # Análisis de Componentes Principales
@@ -595,7 +467,7 @@ fviz_pca_biplot(datos.acp,  repel = TRUE,
 
 #### Resultados por Variables
 
-Empezamos por las contribuciones de las variables a las componentes principales.
+Empezamos por las contribuciones de las variables a las primeras dos componentes principales.
 
 ```{r, echo=FALSE}
 res.var=get_pca_var(datos.acp)
@@ -614,7 +486,7 @@ Hemos podido comprobar lo expuesto anteriormente:
 
 - Seguidamente, la variable `Platelets`, `Age` y `Cholesterol` tiene gran contribución a la segunda componente principal.
 
-- Observemos que a variable `Cholesterol` a pesar de ser la tercera variable mejor representada por la segunda componente principal es la que mejor (de entre estas tres) está representa en conjunto con la CP1 y la CP2.
+- Observemos que la variable `Cholesterol`, a pesar de ser la tercera variable mejor representada por la segunda componente principal, es la que mejor (de entre estas tres) está representa en conjunto con la CP1 y la CP2.
 
 # Cluster + ACP
 
@@ -639,7 +511,7 @@ Viendo este gráfico parece que clusteriza en función de la contribución de ca
 
 Luego están las muestras azules que corresponden a aquellas que parece que estan representadas por `Cholesterol` y `Platelets`. 
 
-A continuación encontramos las verdes que son las que estan más representadas por `Age`, que era una de las variables que mejor se representaba por la segunda componente principal.
+A continuación, encontramos las verdes que son las que estan más representadas por `Age`, que era una de las variables que mejor se representaba por la segunda componente principal.
 
 Y finalmente, encontramos el grupo lila que son las que estan mas representadas por `Albumin` que notemos que también contribuye bastante en la primera componente principal
 
