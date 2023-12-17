@@ -597,7 +597,7 @@ Luego están las muestras azules que corresponden a aquellas que parece que esta
 
 A continuación, encontramos las verdes que son las que estan más representadas por `Age`, que era una de las variables que mejor se representaba por la segunda componente principal.
 
-Y finalmente, encontramos el grupo lila que son las que estan mas representadas por `Albumin` que notemos que también contribuye bastante en la primera componente principal
+Y finalmente, encontramos el grupo lila que son las que estan más representadas por `Albumin` que notemos que también contribuye bastante en la primera componente principal
 
 # Conclusiones
 
